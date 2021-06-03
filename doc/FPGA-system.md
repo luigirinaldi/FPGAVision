@@ -2,7 +2,13 @@
 
 The starter system is based on the demonstrator for the Terasic D8M-GPIO camera module. It consists of a streaming video pipeline with supervisor firmware running on a NIOS II soft processor. 
 
- ## Demonstration image processor
+ ## Streaming video pipeline
+  The file Qsys.qsys contains a number of IP blocks connected together in a streaming video pipline.
+  
+  ![image](https://user-images.githubusercontent.com/4660308/118411031-8cdd7d80-b68a-11eb-8ab2-9c43b0dc87aa.png)
+
+
+## Demonstration image processor
   The file /ip/EEE_IMGPROC/EEE_IMGPROC.v contains an example of a streaming video processor
   
    ### Input and Output Ports
@@ -40,7 +46,18 @@ The starter system is based on the demonstrator for the Terasic D8M-GPIO camera 
 ------------ | -------------
 0x0 | Status register
 0x1 | Read message buffer
-0x2 | ID register
+0x2 | Block ID
+0x3 | Bounding Box Colour
+
+ Status register bits:
+ Bits | Function
+------------ | -------------
+31:16 | Unimplemented
+15:8 | Number of words in message buffer (read only)
+7:5 | Unused
+4 | Flush message buffer (write only)
+3:0 | Unused
+ 
   
  ### Extending the image processor
  You can add whatever logic is necessary to implement your vision algorithm. There are a few high-level challenges:
