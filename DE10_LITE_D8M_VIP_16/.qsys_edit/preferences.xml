@@ -3,7 +3,15 @@
  <debug showDebugMenu="0" />
  <systemtable filter="All Interfaces">
   <columns>
+<<<<<<< Updated upstream:DE10_LITE_D8M_VIP_16/.qsys_edit/preferences.xml
    <connections preferredWidth="143" />
+=======
+<<<<<<< Updated upstream:DE10_LITE_D8M_VIP/.qsys_edit/preferences.xml
+   <connections preferredWidth="303" />
+=======
+   <connections preferredWidth="159" />
+>>>>>>> Stashed changes:DE10_LITE_D8M_VIP_16/.qsys_edit/preferences.xml
+>>>>>>> Stashed changes:DE10_LITE_D8M_VIP/.qsys_edit/preferences.xml
    <irq preferredWidth="34" />
    <name preferredWidth="201" />
    <export preferredWidth="267" />
