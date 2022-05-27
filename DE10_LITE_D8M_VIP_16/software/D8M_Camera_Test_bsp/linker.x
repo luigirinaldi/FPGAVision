@@ -4,15 +4,7 @@
  * Machine generated for CPU 'nios2_gen2' in SOPC Builder design 'Qsys'
  * SOPC Builder design path: ../../Qsys.sopcinfo
  *
-<<<<<<< Updated upstream:DE10_LITE_D8M_VIP_16/software/D8M_Camera_Test_bsp/linker.x
- * Generated: Fri May 14 13:04:40 BST 2021
-=======
-<<<<<<< Updated upstream:DE10_LITE_D8M_VIP/software/D8M_Camera_Test_bsp/linker.x
- * Generated: Wed May 15 19:39:00 CST 2019
-=======
- * Generated: Thu Jun 03 15:15:16 BST 2021
->>>>>>> Stashed changes:DE10_LITE_D8M_VIP_16/software/D8M_Camera_Test_bsp/linker.x
->>>>>>> Stashed changes:DE10_LITE_D8M_VIP/software/D8M_Camera_Test_bsp/linker.x
+ * Generated: Fri May 27 15:08:02 BST 2022
  */
 
 /*
