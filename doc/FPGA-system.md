@@ -57,16 +57,30 @@ The starter system is based on the demonstrator for the Terasic D8M-GPIO camera 
 7:5 | Unused
 4 | Flush message buffer (write only)
 3:0 | Unused
- 
   
- ### Extending the image processor
- You can add whatever logic is necessary to implement your vision algorithm. There are a few high-level challenges:
+ ## Video processor challenge
+ Your video processor should be able to detect two types of object:
+ 
+ An alien
+ 
+![Ball_Stand_2022-May-20_08-48-43PM-000_CustomizedView4964424008_png](https://user-images.githubusercontent.com/4660308/170281547-5264becc-f845-4f23-b4c7-d61ab34834a6.png)
+
+ And an alien building
+ 
+ ![Mars_Building_v1_2022-May-25_01-57-10PM-000_CustomizedView9783624288_png](https://user-images.githubusercontent.com/4660308/170281378-d9f57a53-ad86-439e-b2d0-c4242b33a58a.png)
+ 
+  You can add whatever logic is necessary to detect and locate these objects. There are a few options:
  - Transform the video to make it more suitable for object detection. e.g. filtering, colour space conversion
- - Find pixels that could be part of coloured balls
- - Group candidate pixels together to find bounding boxes of balls
- - Use the position and size of bounding boxes to determine the location of the ball relative to the camera in three dimensions
+ - Find pixels that could be part of objects
+ - Group candidate pixels together to find bounding boxes
+ - Use the position, geometry and pattern of objects to determine their relative to the camera in three dimensions
  - (Maybe software) Filter out glitches and erroneous results
 
-  Note that the streaming interface does not give you random access to the image data - you have to process pixels in the order that they arrive. Some processing algorithms require you to directly compare a pixel with the pixel above, for example. To do this you'll need to store an entire row of data in a shift register. If you do buffer image data, you may find it easier to fork the data into a separate stream rather than build the buffer into the video output pipeline - then you can just use the valid input as an enable signal and not worry about the backpressure.
+  Note that the streaming interface does not give you random access to the image data - you have to process pixels in the order that they arrive. Some processing algorithms require you to directly compare a pixel with the pixel above, for example. To do this you'll need to store an entire row of data in a shift register.
  
+## Connecting the FPGA to an ESP32
+
+ The starter project shows you how to get information from your logic into software on the NIOS II processor. From there, it needs to be transferred to the ESP32 microcontroller so that it can be used for obstacle avoidance and uploaded to the remote database.
+ 
+ The Qsys Platform Designer has a library of communication modules, such as UART, that you can connect to the NIOS II via its memory-mapped bus. Instantiating these modules will create handlers in the board support package that allow you to access these modules in software. You can also map their I/O pins to physical pins that connect to matching communication ports on the ESP32.
  
