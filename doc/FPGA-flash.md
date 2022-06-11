@@ -39,7 +39,7 @@
  You will have seen that before - the only output file is `DE10_LITE_D8M_VIP_time_limited.sof`.
  There is more information about licensed IP blocks in the compilation report, under Assembler → Encrypted IP Cores Summary.
  
- ## Running NIOS II driect from Flash
+ ## Running NIOS II direct from Flash
  
  You may find that you run out of memory (M9K blocks) on your FPGA, either because you need to increase the size of the on-chip memory to support more code, or because you need more memory to buffer pixels in the image processor.
  The NIOS II can be configured to run code directly from the flash memory, avoiding the need to store the program in RAM and reducing the required size of the on-chip memory.
