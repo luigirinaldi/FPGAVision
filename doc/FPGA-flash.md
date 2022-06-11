@@ -2,7 +2,7 @@
  
  During development you configure the FPGA with a `.sof` file. The configuration is volatile and the FPGA reverts to its original configuration when power is removed.
  
- You need to program a flash memory inside the FPGA if you want your FPGA configuration to persist when power is lost an reapplied. That is done with a `.pof` file.
+ You need to program a flash memory inside the FPGA if you want your FPGA configuration to persist when power is reapplied. That is done with a `.pof` file.
  
  ## Quartus Licence and Project Setup
  
@@ -39,3 +39,10 @@
  You will have seen that before - the only output file is `DE10_LITE_D8M_VIP_time_limited.sof`.
  There is more information about licensed IP blocks in the compilation report, under Assembler → Encrypted IP Cores Summary.
  
+ ## Running NIOS II driect from Flash
+ 
+ You may find that you run out of memory (M9K blocks) on your FPGA, either because you need to increase the size of the on-chip memory to support more code, or because you need more memory to buffer pixels in the image processor.
+ The NIOS II can be configured to run code directly from the flash memory, avoiding the need to store the program in RAM and reducing the required size of the on-chip memory.
+ I haven't tried this, but you can find documentation here: https://www.intel.com/content/www/us/en/docs/programmable/683689/current/processor-booting-from-on-chip-flash-ufm.html
+
+A downside of this approach is that the flash will need reprogramming whenever you change your code. That may slow your development process and it might not be possible without the IP licences.
