@@ -59,16 +59,6 @@ The starter system is based on the demonstrator for the Terasic D8M-GPIO camera 
 3:0 | Unused
   
  ## Video processor challenge
- Your video processor should be able to detect two types of object:
- 
- An alien
- 
-![Ball_Stand_2022-May-20_08-48-43PM-000_CustomizedView4964424008_png](https://user-images.githubusercontent.com/4660308/170281547-5264becc-f845-4f23-b4c7-d61ab34834a6.png)
-
- And an alien building
- 
- ![Mars_Building_v1_2022-May-25_01-57-10PM-000_CustomizedView9783624288_png](https://user-images.githubusercontent.com/4660308/170281378-d9f57a53-ad86-439e-b2d0-c4242b33a58a.png)
- 
   You can add whatever logic is necessary to detect and locate these objects. There are a few options:
  - Transform the video to make it more suitable for object detection. e.g. filtering, colour space conversion
  - Find pixels that could be part of objects
