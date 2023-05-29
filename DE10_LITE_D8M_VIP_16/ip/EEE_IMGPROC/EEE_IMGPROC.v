@@ -68,7 +68,8 @@ parameter IMAGE_H = 11'd480;
 parameter MESSAGE_BUF_MAX = 256;
 parameter MSG_INTERVAL = 6;
 parameter BB_COL_DEFAULT = 24'h00ff00;
-
+parameter COL_DETECT_DEFAULT = 24'hFFFF00;
+parameter COL_DETECT_THRESH_DEF = 16'hFFFF;
 
 wire [7:0]   red, green, blue, grey;
 wire [7:0]   red_out, green_out, blue_out;
@@ -76,23 +77,36 @@ wire [7:0]   red_out, green_out, blue_out;
 wire         sop, eop, in_valid, out_ready;
 ////////////////////////////////////////////////////////////////////////
 
-// Detect red areas
-wire red_detect;
-assign red_detect = (red[7] | red[6]) & ~green[7] & ~blue[7];
+// testing code for detecting a desired colour
+wire [23:0] des_colour;
+assign des_colour = COL_DETECT_DEFAULT;
+wire [7:0] d_red, d_blue, d_green;
+assign d_red = {des_colour[23:16]};
+assign d_blue = {des_colour[15:8]};
+assign d_green = {des_colour[7:0]};
 
-// Find boundary of cursor box
+// Detect red areas
+wire [16:0] distance_from_col;
+assign distance_from_col = (red - d_red)**2 + (blue - d_blue)**2 + (green - d_green)**2;
+
+wire colour_detect;
+assign colour_detect = (distance_from_col < col_detect_thresh);
+
 
 // Highlight detected areas
-wire [23:0] red_high;	
+wire [23:0] col_high;	
 assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
-assign red_high  =  red_detect ? {8'hff, 8'h0, 8'h0} : {grey, grey, grey};
+// assign grey = 8'hFF - ((|distance_from_col[15:8]) ? 8'hFF : {distance_from_col[7:0]}); // or all the top bits to determine if there are 1s in the MSB
+assign col_high  =  colour_detect ? des_colour : {grey, grey, grey};
+// assign col_high = {grey, grey, grey};
 
 // Show bounding box
 wire [23:0] new_image;
 wire bb_active;
 
+// Find boundary of cursor box
 assign bb_active = ( ((x == left) | (x == right)) & ( y <= bottom && y >= top) ) | ( ((y == top) | (y == bottom)) & ( x <= right && x >= left) ); // top and bottom are flipped for some reason??
-assign new_image = bb_active ? bb_col : red_high;
+assign new_image = bb_active ? bb_col : col_high;
 
 // Switch output pixels depending on mode switch
 // Don't modify the start-of-packet word - it's a packet discriptor
@@ -122,7 +136,7 @@ end
 //Find first and last red pixels
 reg [10:0] x_min, y_min, x_max, y_max;
 always@(posedge clk) begin
-	if (red_detect & in_valid) begin	//Update bounds when the pixel is red
+	if (colour_detect & in_valid) begin	//Update bounds when the pixel is red
 		if (x < x_min) x_min <= x;
 		if (x > x_max) x_max <= x;
 		if (y < y_min) y_min <= y;
@@ -255,18 +269,19 @@ STREAM_REG #(.DATA_WIDTH(26)) out_reg (
 
 reg  [7:0]   reg_status;
 reg	[23:0]	bb_col;
+reg [16:0]  col_detect_thresh;
 
 always @ (posedge clk)
 begin
 	if (~reset_n)
 	begin
 		reg_status <= 8'b0;
-		bb_col <= BB_COL_DEFAULT;
+		col_detect_thresh <= COL_DETECT_THRESH_DEF;
 	end
 	else begin
 		if(s_chipselect & s_write) begin
 		   if      (s_address == `REG_STATUS)	reg_status <= s_writedata[7:0];
-		   if      (s_address == `REG_BBCOL)	bb_col <= s_writedata[23:0];
+		   if      (s_address == `REG_BBCOL)	col_detect_thresh <= s_writedata[16:0];
 		end
 	end
 end

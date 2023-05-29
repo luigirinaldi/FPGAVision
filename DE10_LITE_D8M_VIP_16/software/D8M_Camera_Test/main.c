@@ -262,50 +262,9 @@ int main()
     	   printf("%08x ",word);
        }
 
-       //Update the bounding box colour
-       boundingBoxColour = ((boundingBoxColour + 1) & 0xff);
-       IOWR(0x42000, EEE_IMGPROC_BBCOL, (boundingBoxColour << 8) | (0xff - boundingBoxColour));
+      // update the threshold for colour detection
+      IOWR(0x42000, EEE_IMGPROC_BBCOL, 0x0000FFFF & 0xFFFFFFFF);
 
-      //  Process input commands
-      //  int in = getchar();
-      //  switch (in) {
-      //  	   case 'e': {
-      //  		   exposureTime += EXPOSURE_STEP;
-      //  		   OV8865SetExposure(exposureTime);
-      //  		   printf("\nExposure = %x ", exposureTime);
-      //  	   	   break;}
-      //  	   case 'd': {
-      //  		   exposureTime -= EXPOSURE_STEP;
-      //  		   OV8865SetExposure(exposureTime);
-      //  		   printf("\nExposure = %x ", exposureTime);
-      //  	   	   break;}
-      //  	   case 't': {
-      //  		   gain += GAIN_STEP;
-      //  		   OV8865SetGain(gain);
-      //  		   printf("\nGain = %x ", gain);
-      //  	   	   break;}
-      //  	   case 'g': {
-      //  		   gain -= GAIN_STEP;
-      //  		   OV8865SetGain(gain);
-      //  		   printf("\nGain = %x ", gain);
-      //  	   	   break;}
-      //  	   case 'r': {
-      //   	   current_focus += manual_focus_step;
-      //   	   if(current_focus >1023) current_focus = 1023;
-      //   	   OV8865_FOCUS_Move_to(current_focus);
-      //   	   printf("\nFocus = %x ",current_focus);
-      //  	   	   break;}
-      //  	   case 'f': {
-      //   	   if(current_focus > manual_focus_step) current_focus -= manual_focus_step;
-      //   	   OV8865_FOCUS_Move_to(current_focus);
-      //   	   printf("\nFocus = %x ",current_focus);
-      //  	   	   break;}
-      //  }
-
-
-	   //Main loop delay
-		// OV8865SetExposure(exposureTime);
-		// OV8865SetGain(gain);
 	  usleep(10000);
 
    };
