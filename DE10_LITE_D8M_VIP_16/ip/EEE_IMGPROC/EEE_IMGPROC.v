@@ -78,19 +78,20 @@ wire         sop, eop, in_valid, out_ready;
 
 // Detect red areas
 wire red_detect;
-assign red_detect = red[7] & ~green[7] & ~blue[7];
+assign red_detect = (red[7] | red[6]) & ~green[7] & ~blue[7];
 
 // Find boundary of cursor box
 
 // Highlight detected areas
-wire [23:0] red_high;
+wire [23:0] red_high;	
 assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
 assign red_high  =  red_detect ? {8'hff, 8'h0, 8'h0} : {grey, grey, grey};
 
 // Show bounding box
 wire [23:0] new_image;
 wire bb_active;
-assign bb_active = (x == left) | (x == right) | (y == top) | (y == bottom);
+
+assign bb_active = ( ((x == left) | (x == right)) & ( y <= bottom && y >= top) ) | ( ((y == top) | (y == bottom)) & ( x <= right && x >= left) ); // top and bottom are flipped for some reason??
 assign new_image = bb_active ? bb_col : red_high;
 
 // Switch output pixels depending on mode switch
@@ -125,7 +126,7 @@ always@(posedge clk) begin
 		if (x < x_min) x_min <= x;
 		if (x > x_max) x_max <= x;
 		if (y < y_min) y_min <= y;
-		y_max <= y;
+		y_max <= y;	// because y is always increasing
 	end
 	if (sop & in_valid) begin	//Reset bounds on start of packet
 		x_min <= IMAGE_W-11'h1;
