@@ -68,8 +68,8 @@ parameter IMAGE_H = 11'd480;
 parameter MESSAGE_BUF_MAX = 256;
 parameter MSG_INTERVAL = 6;
 parameter BB_COL_DEFAULT = 24'h00ff00;
-parameter COL_DETECT_DEFAULT = 24'hFFFF00;
-parameter COL_DETECT_THRESH_DEF = 16'hFFFF;
+parameter COL_DETECT_DEFAULT = 24'hFF0000; // detect red
+parameter COL_DETECT_THRESH_DEF = 17'hFFFF;
 
 wire [7:0]   red, green, blue, grey;
 wire [7:0]   red_out, green_out, blue_out;
@@ -80,14 +80,21 @@ wire         sop, eop, in_valid, out_ready;
 // testing code for detecting a desired colour
 wire [23:0] des_colour;
 assign des_colour = COL_DETECT_DEFAULT;
-wire [7:0] d_red, d_blue, d_green;
-assign d_red = {des_colour[23:16]};
-assign d_blue = {des_colour[15:8]};
-assign d_green = {des_colour[7:0]};
 
-// Detect red areas
-wire [16:0] distance_from_col;
-assign distance_from_col = (red - d_red)**2 + (blue - d_blue)**2 + (green - d_green)**2;
+// compute distances from desired colour
+wire [7:0] d_red, d_blue, d_green;
+
+// compute absolute distances between each value of RGB 
+assign d_red = {des_colour[23:16]} > red ? {des_colour[23:16]} - red : red - {des_colour[23:16]};
+assign d_blue = {des_colour[15:8]} > blue ? {des_colour[15:8]} - blue : blue - {des_colour[15:8]};
+assign d_green = {des_colour[7:0]} > green ? {des_colour[7:0]} - green : green - {des_colour[7:0]};
+
+
+// find combined distance from desired colour
+wire [17:0] distance_from_col; // 18 bits becasue the max value is 255^2 * 3
+// assign distance_from_col = (d_red + d_green + d_blue) / 3; // average distance from each colour
+assign distance_from_col = (d_red * d_red) + (d_blue * d_blue) + (d_green * d_green);
+// assign distance_from_col = ((red - d_red)**2) + ((blue - d_blue)**2) + ((green - d_green)**2);
 
 wire colour_detect;
 assign colour_detect = (distance_from_col < col_detect_thresh);
@@ -96,9 +103,11 @@ assign colour_detect = (distance_from_col < col_detect_thresh);
 // Highlight detected areas
 wire [23:0] col_high;	
 assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
-// assign grey = 8'hFF - ((|distance_from_col[15:8]) ? 8'hFF : {distance_from_col[7:0]}); // or all the top bits to determine if there are 1s in the MSB
-assign col_high  =  colour_detect ? des_colour : {grey, grey, grey};
-// assign col_high = {grey, grey, grey};
+
+wire [7:0] yellow_tmp;
+// assign yellow_tmp = 8'hFF - {distance_from_col[7:0]};
+assign col_high  =  colour_detect ? {red, green, blue} : {grey, grey, grey}; 
+// assign col_high = {yellow_tmp, yellow_tmp, yellow_tmp};
 
 // Show bounding box
 wire [23:0] new_image;
@@ -113,7 +122,7 @@ assign new_image = bb_active ? bb_col : col_high;
 // Don't modify data in non-video packets
 assign {red_out, green_out, blue_out} = (mode & ~sop & packet_video) ? new_image : {red,green,blue};
 
-//Count valid pixels to tget the image coordinates. Reset and detect packet type on Start of Packet.
+//Count valid pixels to get the image coordinates. Reset and detect packet type on Start of Packet.
 reg [10:0] x, y;
 reg packet_video;
 always@(posedge clk) begin
@@ -199,7 +208,7 @@ always@(*) begin	//Write words to FIFO as state machine advances
 			msg_buf_wr = 1'b1;
 		end
 		2'b10: begin
-			msg_buf_in = {5'b0, x_min, 5'b0, y_min};	//Top left coordinate
+			// msg_buf_in = {5'b0, x_min, 5'b0, y_min};	//Top left coordinate
 			msg_buf_wr = 1'b1;
 		end
 		2'b11: begin
@@ -269,13 +278,14 @@ STREAM_REG #(.DATA_WIDTH(26)) out_reg (
 
 reg  [7:0]   reg_status;
 reg	[23:0]	bb_col;
-reg [16:0]  col_detect_thresh;
+reg [17:0]  col_detect_thresh;
 
 always @ (posedge clk)
 begin
 	if (~reset_n)
 	begin
 		reg_status <= 8'b0;
+		bb_col <= BB_COL_DEFAULT;
 		col_detect_thresh <= COL_DETECT_THRESH_DEF;
 	end
 	else begin

@@ -20,9 +20,9 @@
 #define EEE_IMGPROC_ID 2
 #define EEE_IMGPROC_BBCOL 3
 
-#define EXPOSURE_INIT 0x000400
+#define EXPOSURE_INIT 0x001000
 #define EXPOSURE_STEP 0x100
-#define GAIN_INIT 0x040
+#define GAIN_INIT 0x400
 #define GAIN_STEP 0x040
 #define DEFAULT_LEVEL 3
 
@@ -182,24 +182,24 @@ int main()
 
 
     //////////////////////////////////////////////////////////
-        alt_u16 bin_level = DEFAULT_LEVEL;
-        alt_u8  manual_focus_step = 10;
-        alt_u16  current_focus = 300;
-    	int boundingBoxColour = 0;
-    	alt_u32 exposureTime = EXPOSURE_INIT;
-    	alt_u16 gain = GAIN_INIT;
+    alt_u16 bin_level = DEFAULT_LEVEL;
+    alt_u8  manual_focus_step = 10;
+    alt_u16  current_focus = 300;
+    int boundingBoxColour = 0;
+    alt_u32 exposureTime = EXPOSURE_INIT;
+    alt_u16 gain = GAIN_INIT;
 
-        OV8865SetExposure(exposureTime);
-        // OV8865SetGain(gain);
-        Focus_Init();
+      // OV8865SetExposure(exposureTime);
+      // OV8865SetGain(gain);
+      Focus_Init();
 
-        FILE* ser = fopen("/dev/uart_0", "rb+");
-        if(ser){
-        	printf("Opened UART\n");
-        } else {
-        	printf("Failed to open UART\n");
-        	while (1);
-        }
+      FILE* ser = fopen("/dev/uart_0", "rb+");
+      if(ser){
+        printf("Opened UART\n");
+      } else {
+        printf("Failed to open UART\n");
+        while (1);
+      }
 
   while(1){
 
@@ -263,7 +263,7 @@ int main()
        }
 
       // update the threshold for colour detection
-      IOWR(0x42000, EEE_IMGPROC_BBCOL, 0x0000FFFF & 0xFFFFFFFF);
+      IOWR(0x42000, EEE_IMGPROC_BBCOL, 0x3FFF & 0xFFFFFFFF);
 
 	  usleep(10000);
 
