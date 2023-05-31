@@ -191,7 +191,7 @@ int main()
 
       // OV8865SetExposure(exposureTime);
       // OV8865SetGain(gain);
-      Focus_Init();
+      // Focus_Init();
 
       FILE* ser = fopen("/dev/uart_0", "rb+");
       if(ser){
@@ -200,6 +200,10 @@ int main()
         printf("Failed to open UART\n");
         while (1);
       }
+
+  // if the MS bit is set then the threshold is begin updated
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | 10); // update the threshold for colour detection
+  IOWR(0x42000, EEE_IMGPROC_BBCOL,  0xff0000 & 0x0FFFFFFF); // update the colour being detected
 
   while(1){
 
@@ -299,8 +303,7 @@ int main()
     	   printf("%08x ",word);
        }
 
-      // update the threshold for colour detection
-      IOWR(0x42000, EEE_IMGPROC_BBCOL, 0x0004 & 0xFFFFFFFF);
+      
 
 	  usleep(10000);
 

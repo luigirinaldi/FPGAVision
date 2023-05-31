@@ -78,8 +78,6 @@ wire         sop, eop, in_valid, out_ready;
 ////////////////////////////////////////////////////////////////////////
 
 // desired colour setup
-wire [23:0] des_colour;
-assign des_colour = COL_DETECT_DEFAULT;
 wire [7:0] d_red, d_blue, d_green, d_h, d_s, d_v;
 
 // extract RGB values 
@@ -117,7 +115,7 @@ assign colour_detect = (distance_from_col < col_detect_thresh);
 
 // // Highlight detected areas
 wire [23:0] col_high;	
-// assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
+assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
 assign col_high  =  colour_detect ? {d_red, d_green, d_blue} : {grey, grey, grey}; 
 
 // assign col_high = {hue, hue, hue};
@@ -221,7 +219,7 @@ always@(*) begin	//Write words to FIFO as state machine advances
 			msg_buf_wr = 1'b1;
 		end
 		2'b10: begin
-			// msg_buf_in = {5'b0, x_min, 5'b0, y_min};	//Top left coordinate
+			msg_buf_in = {5'b0, x_min, 5'b0, y_min};	//Top left coordinate
 			msg_buf_wr = 1'b1;
 		end
 		2'b11: begin
@@ -292,6 +290,7 @@ STREAM_REG #(.DATA_WIDTH(26)) out_reg (
 reg  [7:0]   reg_status;
 reg	[23:0]	bb_col;
 reg [17:0]  col_detect_thresh;
+reg [23:0] des_colour;
 
 always @ (posedge clk)
 begin
@@ -299,12 +298,14 @@ begin
 	begin
 		reg_status <= 8'b0;
 		bb_col <= BB_COL_DEFAULT;
+    des_colour <= COL_DETECT_DEFAULT;
 		col_detect_thresh <= COL_DETECT_THRESH_DEF;
 	end
 	else begin
 		if(s_chipselect & s_write) begin
 		   if      (s_address == `REG_STATUS)	reg_status <= s_writedata[7:0];
-		   if      (s_address == `REG_BBCOL)	col_detect_thresh <= s_writedata[16:0];
+		   if      ((s_address == `REG_BBCOL) && s_writedata[31])	col_detect_thresh <= s_writedata[17:0]; // update threshold
+       if      ((s_address == `REG_BBCOL) && !s_writedata[31])	des_colour <= s_writedata[23:0]; // update colour
 		end
 	end
 end
