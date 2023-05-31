@@ -252,6 +252,43 @@ int main()
        }
 	#endif
 
+  //Process input commands
+  int in = getchar();
+  switch (in) {
+      case 'e': {
+        exposureTime += EXPOSURE_STEP;
+        OV8865SetExposure(exposureTime);
+        printf("\nExposure = %x ", exposureTime);
+          break;}
+      case 'd': {
+        exposureTime -= EXPOSURE_STEP;
+        OV8865SetExposure(exposureTime);
+        printf("\nExposure = %x ", exposureTime);
+          break;}
+      case 't': {
+        gain += GAIN_STEP;
+        OV8865SetGain(gain);
+        printf("\nGain = %x ", gain);
+          break;}
+      case 'g': {
+        gain -= GAIN_STEP;
+        OV8865SetGain(gain);
+        printf("\nGain = %x ", gain);
+          break;}
+      case 'r': {
+        current_focus += manual_focus_step;
+        if(current_focus >1023) current_focus = 1023;
+        OV8865_FOCUS_Move_to(current_focus);
+        printf("\nFocus = %x ",current_focus);
+          break;}
+      case 'f': {
+        if(current_focus > manual_focus_step) current_focus -= manual_focus_step;
+        OV8865_FOCUS_Move_to(current_focus);
+        printf("\nFocus = %x ",current_focus);
+          break;}
+  }
+
+
        //Read messages from the image processor and print them on the terminal
        while ((IORD(0x42000,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
            int word = IORD(0x42000,EEE_IMGPROC_MSG); 			//Get next word from message buffer
@@ -263,7 +300,7 @@ int main()
        }
 
       // update the threshold for colour detection
-      IOWR(0x42000, EEE_IMGPROC_BBCOL, 0x3FFF & 0xFFFFFFFF);
+      IOWR(0x42000, EEE_IMGPROC_BBCOL, 0x0004 & 0xFFFFFFFF);
 
 	  usleep(10000);
 

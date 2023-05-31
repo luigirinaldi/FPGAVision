@@ -68,46 +68,59 @@ parameter IMAGE_H = 11'd480;
 parameter MESSAGE_BUF_MAX = 256;
 parameter MSG_INTERVAL = 6;
 parameter BB_COL_DEFAULT = 24'h00ff00;
-parameter COL_DETECT_DEFAULT = 24'hFF0000; // detect red
+parameter COL_DETECT_DEFAULT = 24'hFFFF00; 
 parameter COL_DETECT_THRESH_DEF = 17'hFFFF;
 
-wire [7:0]   red, green, blue, grey;
+wire [7:0]   red, green, blue, grey, hue, saturation, value;
 wire [7:0]   red_out, green_out, blue_out;
 
 wire         sop, eop, in_valid, out_ready;
 ////////////////////////////////////////////////////////////////////////
 
-// testing code for detecting a desired colour
+// desired colour setup
 wire [23:0] des_colour;
 assign des_colour = COL_DETECT_DEFAULT;
+wire [7:0] d_red, d_blue, d_green, d_h, d_s, d_v;
 
-// compute distances from desired colour
-wire [7:0] d_red, d_blue, d_green;
+// extract RGB values 
+assign d_red = {des_colour[23:16]};
+assign d_blue = {des_colour[7:0]};
+assign d_green = {des_colour[15:8]};
 
-// compute absolute distances between each value of RGB 
-assign d_red = {des_colour[23:16]} > red ? {des_colour[23:16]} - red : red - {des_colour[23:16]};
-assign d_blue = {des_colour[15:8]} > blue ? {des_colour[15:8]} - blue : blue - {des_colour[15:8]};
-assign d_green = {des_colour[7:0]} > green ? {des_colour[7:0]} - green : green - {des_colour[7:0]};
+// convert desired colour into HSV
+RGB_TO_HUE desired_colour(
+  .red(d_red),
+  .green(d_green),
+  .blue(d_blue),
+  .hue(d_h),
+  .saturation(d_s),
+  .value(d_v)
+);
 
+// convert current colour into HSV
+RGB_TO_HUE curr_pixel(
+  .red(red),
+  .green(green),
+  .blue(blue),
+  .hue(hue),
+  .saturation(saturation),
+  .value(value)
+);
 
-// find combined distance from desired colour
+// // find combined distance from desired colour
 wire [17:0] distance_from_col; // 18 bits becasue the max value is 255^2 * 3
-// assign distance_from_col = (d_red + d_green + d_blue) / 3; // average distance from each colour
-assign distance_from_col = (d_red * d_red) + (d_blue * d_blue) + (d_green * d_green);
-// assign distance_from_col = ((red - d_red)**2) + ((blue - d_blue)**2) + ((green - d_green)**2);
+assign distance_from_col = d_h > hue ? d_h - hue : hue - d_h; // absolute value of the hue difference
 
 wire colour_detect;
 assign colour_detect = (distance_from_col < col_detect_thresh);
 
 
-// Highlight detected areas
+// // Highlight detected areas
 wire [23:0] col_high;	
-assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
+// assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
+assign col_high  =  colour_detect ? {d_red, d_green, d_blue} : {grey, grey, grey}; 
 
-wire [7:0] yellow_tmp;
-// assign yellow_tmp = 8'hFF - {distance_from_col[7:0]};
-assign col_high  =  colour_detect ? {red, green, blue} : {grey, grey, grey}; 
-// assign col_high = {yellow_tmp, yellow_tmp, yellow_tmp};
+// assign col_high = {hue, hue, hue};
 
 // Show bounding box
 wire [23:0] new_image;
