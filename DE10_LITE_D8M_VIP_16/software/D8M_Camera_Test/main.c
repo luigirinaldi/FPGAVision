@@ -180,8 +180,18 @@ int main()
   // Focus_Init();
 
   // if the MS bit is set then the threshold is begin updated
-  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
-  IOWR(0x42000, EEE_IMGPROC_BBCOL,  0xffa100 & 0x0FFFFFFF); // update the colour being detected
+  // IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x100 << 29) | colour_threshold); // update the threshold for colour detection
+  // IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x101 << 29) | colour_threshold); // update the threshold for colour detection
+  // IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x110 << 29) | colour_threshold); // update the threshold for colour detection
+
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b100 << 29) | 0x0000); // update the threshold for red colour detection
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b101 << 29) | 0x0000); // update the threshold for yellow colour detection
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b110 << 29) | 0x2500); // update the threshold for blue colour detection
+
+
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b000 << 29) | 0x00ff3a40); // red
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b001 << 29) | 0x00fc7700); // yellow
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b010 << 29) | 0x008033ff); // blue
 
   FILE* ser = fopen("/dev/uart_0", "rb+");
   if(ser){
@@ -230,13 +240,17 @@ int main()
         case 'w': {
           colour_threshold += colour_thresh_step;
           if(colour_threshold > 0x0FFFFFFF) colour_threshold = 0x0FFFFFFF;
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
+          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b100 << 29) | colour_threshold); // update the threshold for colour detection
+          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b101 << 29) | colour_threshold); // update the threshold for colour detection
+          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b110 << 29) | colour_threshold); // update the threshold for colour detection
           printf("\nColour Thresh = %x ",colour_threshold);
             break;}
         case 's': {
           colour_threshold -= colour_thresh_step;
           if (colour_threshold < 0) colour_threshold = 0;
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
+          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b100 << 29) | colour_threshold); // update the threshold for colour detection
+          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b101 << 29) | colour_threshold); // update the threshold for colour detection
+          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b110 << 29) | colour_threshold); // update the threshold for colour detection
           printf("\nColour Thresh = %x ",colour_threshold);
             break;}
     }
