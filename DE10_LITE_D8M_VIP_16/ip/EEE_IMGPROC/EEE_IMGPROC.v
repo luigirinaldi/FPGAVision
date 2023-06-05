@@ -67,9 +67,11 @@ parameter IMAGE_W = 11'd640;
 parameter IMAGE_H = 11'd480;
 parameter MESSAGE_BUF_MAX = 256;
 parameter MSG_INTERVAL = 6;
-parameter BB_COL_DEFAULT = 24'h00ff00;
+parameter BB_COL = 24'h00ff00;
 parameter COL_DETECT_DEFAULT = 24'hFF0000; // detect red
 parameter COL_DETECT_THRESH_DEF = 17'hFFFF;
+parameter AVG_FRAMES = 10;
+parameter CROSSHAIR_COLOUR = 24'h00ff00; 
 
 wire [7:0]   red, green, blue, grey;
 wire [7:0]   red_out, green_out, blue_out;
@@ -77,25 +79,21 @@ wire [7:0]   red_out, green_out, blue_out;
 wire         sop, eop, in_valid, out_ready;
 ////////////////////////////////////////////////////////////////////////
 
-// testing code for detecting a desired colour
-wire [23:0] des_colour;
-assign des_colour = COL_DETECT_DEFAULT;
-
 // compute distances from desired colour
 wire [7:0] d_red, d_blue, d_green;
 
 // compute absolute distances between each value of RGB 
 assign d_red = {des_colour[23:16]} > red ? {des_colour[23:16]} - red : red - {des_colour[23:16]};
-assign d_blue = {des_colour[15:8]} > blue ? {des_colour[15:8]} - blue : blue - {des_colour[15:8]};
-assign d_green = {des_colour[7:0]} > green ? {des_colour[7:0]} - green : green - {des_colour[7:0]};
+assign d_green = {des_colour[15:8]} > green ? {des_colour[15:8]} - green : green - {des_colour[15:8]};
+assign d_blue = {des_colour[7:0]} > blue ? {des_colour[7:0]} - blue : blue - {des_colour[7:0]};
 
 
 // find combined distance from desired colour
 wire [17:0] distance_from_col; // 18 bits becasue the max value is 255^2 * 3
-// assign distance_from_col = (d_red + d_green + d_blue) / 3; // average distance from each colour
 assign distance_from_col = (d_red * d_red) + (d_blue * d_blue) + (d_green * d_green);
-// assign distance_from_col = ((red - d_red)**2) + ((blue - d_blue)**2) + ((green - d_green)**2);
 
+
+// determine if colour matches or not
 wire colour_detect;
 assign colour_detect = (distance_from_col < col_detect_thresh);
 
@@ -104,18 +102,19 @@ assign colour_detect = (distance_from_col < col_detect_thresh);
 wire [23:0] col_high;	
 assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
 
-wire [7:0] yellow_tmp;
-// assign yellow_tmp = 8'hFF - {distance_from_col[7:0]};
-assign col_high  =  colour_detect ? {red, green, blue} : {grey, grey, grey}; 
-// assign col_high = {yellow_tmp, yellow_tmp, yellow_tmp};
+assign col_high = colour_detect ? des_colour : {grey, grey, grey}; 
 
 // Show bounding box
 wire [23:0] new_image;
 wire bb_active;
+wire cursor_active;
+
 
 // Find boundary of cursor box
-assign bb_active = ( ((x == left) | (x == right)) & ( y <= bottom && y >= top) ) | ( ((y == top) | (y == bottom)) & ( x <= right && x >= left) ); // top and bottom are flipped for some reason??
-assign new_image = bb_active ? bb_col : col_high;
+assign bb_active = (((x == left) | (x == right)) & ( y <= bottom && y >= top) ) | ( ((y == top) | (y == bottom)) & ( x <= right && x >= left) ); // top and bottom are flipped for some reason??
+assign cursor_active = ( x == centre_x ) | ( y == centre_y);
+
+assign new_image = (bb_active | cursor_active) ? (cursor_active ? CROSSHAIR_COLOUR : BB_COL) : col_high;
 
 // Switch output pixels depending on mode switch
 // Don't modify the start-of-packet word - it's a packet discriptor
@@ -144,8 +143,23 @@ end
 
 //Find first and last red pixels
 reg [10:0] x_min, y_min, x_max, y_max;
+reg [31:0] sum_x, sum_y; // assign a bunch of bits since the sum can become quite large
+reg [20:0] num_highs; // numbers of detected pixels
+
+//Process bounding box and centering at the end of the frame.
+reg [1:0] msg_state;
+reg [10:0] left, right, top, bottom;
+reg [7:0] frame_count;
+reg [10:0] centre_x, centre_y;
+reg [3:0] frame_averaging;
+
 always@(posedge clk) begin
 	if (colour_detect & in_valid) begin	//Update bounds when the pixel is red
+    num_highs <= num_highs + 1; // increment number of total detected pixels
+    // increment sums
+    sum_x <= sum_x + x;
+    sum_y <= sum_y + y;
+
 		if (x < x_min) x_min <= x;
 		if (x > x_max) x_max <= x;
 		if (y < y_min) y_min <= y;
@@ -157,13 +171,7 @@ always@(posedge clk) begin
 		y_min <= IMAGE_H-11'h1;
 		y_max <= 0;
 	end
-end
 
-//Process bounding box at the end of the frame.
-reg [1:0] msg_state;
-reg [10:0] left, right, top, bottom;
-reg [7:0] frame_count;
-always@(posedge clk) begin
 	if (eop & in_valid & packet_video) begin  //Ignore non-video packets
 		
 		//Latch edges for display overlay on next frame
@@ -172,6 +180,15 @@ always@(posedge clk) begin
 		top <= y_min;
 		bottom <= y_max;
 		
+    if (frame_averaging >= AVG_FRAMES) begin
+      centre_x <= sum_x / num_highs;
+      centre_y <= sum_y / num_highs;
+      sum_x <= 0;
+      sum_y <= 0;
+      num_highs <= 0;
+      frame_averaging <= 0;
+    end
+    else frame_averaging <= frame_averaging + 1;
 		
 		//Start message writer FSM once every MSG_INTERVAL frames, if there is room in the FIFO
 		frame_count <= frame_count - 1;
@@ -277,21 +294,22 @@ STREAM_REG #(.DATA_WIDTH(26)) out_reg (
 // Process write
 
 reg  [7:0]   reg_status;
-reg	[23:0]	bb_col;
 reg [17:0]  col_detect_thresh;
+reg [23:0]  des_colour;
 
 always @ (posedge clk)
 begin
 	if (~reset_n)
 	begin
 		reg_status <= 8'b0;
-		bb_col <= BB_COL_DEFAULT;
+    des_colour <= COL_DETECT_DEFAULT;
 		col_detect_thresh <= COL_DETECT_THRESH_DEF;
 	end
 	else begin
 		if(s_chipselect & s_write) begin
 		   if      (s_address == `REG_STATUS)	reg_status <= s_writedata[7:0];
-		   if      (s_address == `REG_BBCOL)	col_detect_thresh <= s_writedata[16:0];
+		   if      ((s_address == `REG_BBCOL) && s_writedata[31])	col_detect_thresh <= s_writedata[17:0]; // update threshold
+       if      ((s_address == `REG_BBCOL) && !s_writedata[31])	des_colour <= s_writedata[23:0]; // update colour
 		end
 	end
 end
@@ -316,7 +334,7 @@ begin
 		if   (s_address == `REG_STATUS) s_readdata <= {16'b0,msg_buf_size,reg_status};
 		if   (s_address == `READ_MSG) s_readdata <= {msg_buf_out};
 		if   (s_address == `READ_ID) s_readdata <= 32'h1234EEE2;
-		if   (s_address == `REG_BBCOL) s_readdata <= {8'h0, bb_col};
+		// if   (s_address == `REG_BBCOL) s_readdata <= {8'h0, bb_col};
 	end
 	
 	read_d <= s_read;
