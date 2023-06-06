@@ -184,14 +184,14 @@ int main()
   // IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x101 << 29) | colour_threshold); // update the threshold for colour detection
   // IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x110 << 29) | colour_threshold); // update the threshold for colour detection
 
-  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b100 << 29) | 0x0000); // update the threshold for red colour detection
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b100 << 29) | 0x2000); // update the threshold for red colour detection
   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b101 << 29) | 0x0000); // update the threshold for yellow colour detection
-  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b110 << 29) | 0x2500); // update the threshold for blue colour detection
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b110 << 29) | 0x0000); // update the threshold for blue colour detection
 
 
-  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b000 << 29) | 0x00ff3a40); // red
-  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b001 << 29) | 0x00fc7700); // yellow
-  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b010 << 29) | 0x008033ff); // blue
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b000 << 29) | 0x00ff0000); // red
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b001 << 29) | 0x0000ffff); // yellow
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b010 << 29) | 0x0000ffff); // blue
 
   FILE* ser = fopen("/dev/uart_0", "rb+");
   if(ser){
@@ -237,34 +237,34 @@ int main()
           OV8865_FOCUS_Move_to(current_focus);
           printf("\nFocus = %x ",current_focus);
             break;}
-        case 'w': {
-          colour_threshold += colour_thresh_step;
-          if(colour_threshold > 0x0FFFFFFF) colour_threshold = 0x0FFFFFFF;
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b100 << 29) | colour_threshold); // update the threshold for colour detection
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b101 << 29) | colour_threshold); // update the threshold for colour detection
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b110 << 29) | colour_threshold); // update the threshold for colour detection
-          printf("\nColour Thresh = %x ",colour_threshold);
-            break;}
-        case 's': {
-          colour_threshold -= colour_thresh_step;
-          if (colour_threshold < 0) colour_threshold = 0;
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b100 << 29) | colour_threshold); // update the threshold for colour detection
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b101 << 29) | colour_threshold); // update the threshold for colour detection
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b110 << 29) | colour_threshold); // update the threshold for colour detection
-          printf("\nColour Thresh = %x ",colour_threshold);
-            break;}
+        // case 'w': {
+        //   colour_threshold += colour_thresh_step;
+        //   if(colour_threshold > 0x0FFFFFFF) colour_threshold = 0x0FFFFFFF;
+        //   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b100 << 29) | colour_threshold); // update the threshold for colour detection
+        //   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b101 << 29) | colour_threshold); // update the threshold for colour detection
+        //   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b110 << 29) | colour_threshold); // update the threshold for colour detection
+        //   printf("\nColour Thresh = %x ",colour_threshold);
+        //     break;}
+        // case 's': {
+        //   colour_threshold -= colour_thresh_step;
+        //   if (colour_threshold < 0) colour_threshold = 0;
+        //   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b100 << 29) | colour_threshold); // update the threshold for colour detection
+        //   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b101 << 29) | colour_threshold); // update the threshold for colour detection
+        //   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b110 << 29) | colour_threshold); // update the threshold for colour detection
+        //   printf("\nColour Thresh = %x ",colour_threshold);
+        //     break;}
     }
 
 
     // //Read messages from the image processor and print them on the terminal
-    // while ((IORD(0x42000,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
-    //     int word = IORD(0x42000,EEE_IMGPROC_MSG); 			//Get next word from message buffer
-    //   if (fwrite(&word, 4, 1, ser) != 1)
-    //     printf("Error writing to UART");
-    //     if (word == EEE_IMGPROC_MSG_START)				//Newline on message identifier
-    //     printf("\n");
-    //   printf("%08x ",word);
-    // }
+    while ((IORD(0x42000,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
+        int word = IORD(0x42000,EEE_IMGPROC_MSG); 			//Get next word from message buffer
+      if (fwrite(&word, 4, 1, ser) != 1)
+        printf("Error writing to UART");
+        if (word == EEE_IMGPROC_MSG_START)				//Newline on message identifier
+        printf("\n");
+      printf("%08x ",word);
+    }
 
     usleep(10000);
 

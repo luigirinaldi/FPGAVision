@@ -72,6 +72,7 @@ parameter COL_DETECT_DEFAULT = 24'hFF0000; // detect red
 parameter COL_DETECT_THRESH_DEF = 17'hFFFF;
 parameter AVG_FRAMES = 10;
 parameter CROSSHAIR_COLOUR = 24'h00ff00; 
+parameter CROSSHAIR_SIZE = 8;
 parameter MIN_AVG_NUM = 20;
 
 wire [7:0]   red, green, blue, grey;
@@ -92,11 +93,16 @@ COL_DIST col_distance(
   .d3(dist_blue)
 );
 
-wire [1:0] detected_colour;
-assign detected_colour = ((dist_red < dist_yellow) && (dist_red < dist_blue)) ? 2'b00 : ((dist_yellow < dist_blue) ? 2'b01 : 2'b10);
 // determine if colour matches or not
-wire colour_detect;
-assign colour_detect = (dist_red < red_thresh) | (dist_yellow < yellow_thresh) | (dist_blue < blue_thresh);
+wire colour_detect, r_det, y_det, b_det;
+assign r_det = (dist_red < red_thresh);
+assign y_det = (dist_yellow < yellow_thresh);
+assign b_det = (dist_blue < blue_thresh);
+
+assign colour_detect = r_det | y_det | b_det;
+
+wire [1:0] detected_colour;
+assign detected_colour = (r_det && (dist_red < dist_yellow) && (dist_red < dist_blue)) ? 2'b00 : (y_det && (dist_yellow < dist_blue) ? 2'b01 : ( b_det ? 2'b10 : 2'b11 ));
 
 // Show bounding box
 wire [23:0] new_image;
@@ -107,13 +113,13 @@ wire c3_active;
 // Highlight detected areas
 wire [23:0] col_high;	
 assign grey = green[7:1] + red[7:2] + blue[7:2]; //Grey = green/2 + red/4 + blue/4
-assign col_high = colour_detect ? (detected_colour == 2'b00 ? des_red : (detected_colour == 2'b01 ? des_yellow : des_blue) ) : {grey, grey, grey}; 
+assign col_high = colour_detect ? (detected_colour == 2'b00 ? des_red : (detected_colour == 2'b01 ? des_yellow : ( detected_colour == 2'b10 ? des_blue : {grey, grey, grey} )) ) : {grey, grey, grey} ; 
 
 // Find boundary of cursor box
 // assign bb_active = (((x == left) | (x == right)) & ( y <= bottom && y >= top) ) | ( ((y == top) | (y == bottom)) & ( x <= right && x >= left) ); // top and bottom are flipped for some reason??
-assign c1_active = ( x == c1_x ) | ( y == c1_y);
-assign c2_active = ( x == c2_x ) | ( y == c2_y);
-assign c3_active = ( x == c3_x ) | ( y == c3_y);
+assign c1_active = (( x <= c1_x + CROSSHAIR_SIZE ) & ( x >= c1_x - CROSSHAIR_SIZE ) & (y == c1_y)) |  (( y <= c1_y + CROSSHAIR_SIZE ) & ( y >= c1_y - CROSSHAIR_SIZE ) & (x == c1_x));
+assign c2_active = (( x <= c2_x + CROSSHAIR_SIZE ) & ( x >= c2_x - CROSSHAIR_SIZE ) & (y == c2_y)) |  (( y <= c2_y + CROSSHAIR_SIZE ) & ( y >= c2_y - CROSSHAIR_SIZE ) & (x == c2_x));
+assign c3_active = (( x <= c3_x + CROSSHAIR_SIZE ) & ( x >= c3_x - CROSSHAIR_SIZE ) & (y == c3_y)) |  (( y <= c3_y + CROSSHAIR_SIZE ) & ( y >= c3_y - CROSSHAIR_SIZE ) & (x == c3_x));
 
 assign new_image = c1_active ? 24'hFF00FF : ( c2_active ? 24'h00FF00 : ( c3_active ? 24'h00FFFF : col_high ));
 
@@ -177,22 +183,24 @@ reg [3:0] frame_averaging;
 always@(posedge clk) begin
 	if (colour_detect & in_valid) begin	//Update bounds when the pixel is red
     
-    if (detected_colour == 2'b00) begin
-      num_highs1 <= num_highs1 + 1; // increment number of total detected pixels
-      // increment sums
-      sum1_x <= sum1_x + x;
-      sum1_y <= sum1_y + y;
-    end
-    else if (detected_colour == 2'b01) begin
-      num_highs2 <= num_highs2 + 1;
-      sum2_x <= sum2_x + x;
-      sum2_y <= sum2_y + y;
-    end
-    else if (detected_colour == 2'b10) begin
-      num_highs3 <= num_highs3 + 1;
-      sum3_x <= sum3_x + x;
-      sum3_y <= sum3_y + y;
-    end
+    case(detected_colour)
+      2'b00: begin
+        num_highs1 <= num_highs1 + 1; // increment number of total detected pixels
+        // increment sums
+        sum1_x <= sum1_x + x;
+        sum1_y <= sum1_y + y;
+      end
+      2'b01: begin
+        num_highs2 <= num_highs2 + 1;
+        sum2_x <= sum2_x + x;
+        sum2_y <= sum2_y + y;
+      end
+      2'b10: begin
+        num_highs3 <= num_highs3 + 1;
+        sum3_x <= sum3_x + x;
+        sum3_y <= sum3_y + y;
+      end
+    endcase
 
 		// if (x < x_min) x_min <= x;
 		// if (x > x_max) x_max <= x;
@@ -217,26 +225,38 @@ always@(posedge clk) begin
     if (frame_averaging >= AVG_FRAMES) begin
       if (num_highs1 >= MIN_AVG_NUM) begin
         c1_x <= sum1_x / num_highs1;
-        c1_y <= sum1_y / num_highs1;
-        sum1_x <= 0;
-        sum1_y <= 0;
+        c1_y <= sum1_y / num_highs1;       
       end
+      else begin
+        c1_x <= 0;
+        c1_y <= 0;
+      end
+      sum1_x <= 0;
+      sum1_y <= 0;
       num_highs1 <= 0;
 
       if (num_highs2 >= MIN_AVG_NUM) begin
         c2_x <= sum2_x / num_highs2;
-        c2_y <= sum2_y / num_highs2;
-        sum2_x <= 0;
-        sum2_y <= 0;
+        c2_y <= sum2_y / num_highs2;        
       end
+      else begin
+        c2_x <= 0;
+        c2_y <= 0;
+      end
+      sum2_x <= 0;
+      sum2_y <= 0;
       num_highs2 <= 0;
 
       if (num_highs3 >= MIN_AVG_NUM) begin
         c3_x <= sum3_x / num_highs3;
         c3_y <= sum3_y / num_highs3;
-        sum3_x <= 0;
-        sum3_y <= 0;
       end
+      else begin
+        c3_x <= 0;
+        c3_y <= 0;
+      end
+      sum3_x <= 0;
+      sum3_y <= 0;
       num_highs3 <= 0;
 
       frame_averaging <= 0;
@@ -274,15 +294,15 @@ always@(*) begin	//Write words to FIFO as state machine advances
 			msg_buf_wr = 1'b0;
 		end
 		2'b01: begin
-			msg_buf_in = `RED_BOX_MSG_ID;	//Message ID
+			msg_buf_in = {5'b0, c1_x, 5'b0, c1_y};	// red centre
 			msg_buf_wr = 1'b1;
 		end
 		2'b10: begin
-			// msg_buf_in = {5'b0, x_min, 5'b0, y_min};	//Top left coordinate
+			msg_buf_in = {5'b0, c2_x, 5'b0, c2_y};	// red centre
 			msg_buf_wr = 1'b1;
 		end
 		2'b11: begin
-			// msg_buf_in = {5'b0, x_max, 5'b0, y_max}; //Bottom right coordinate
+			msg_buf_in = {5'b0, c3_x, 5'b0, c3_y};	// red centre
 			msg_buf_wr = 1'b1;
 		end
 	endcase
