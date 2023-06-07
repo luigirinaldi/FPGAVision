@@ -72,6 +72,7 @@ parameter COL_DETECT_DEFAULT = 24'hFF0000; // detect red
 parameter COL_DETECT_THRESH_DEF = 17'hFFFF;
 parameter AVG_FRAMES = 10;
 parameter CROSSHAIR_COLOUR = 24'h00ff00; 
+parameter CROSSHAIR_SIZE = 10;
 
 wire [7:0]   red, green, blue, grey;
 wire [7:0]   red_out, green_out, blue_out;
@@ -111,10 +112,10 @@ wire cursor_active;
 
 
 // Find boundary of cursor box
-assign bb_active = (((x == left) | (x == right)) & ( y <= bottom && y >= top) ) | ( ((y == top) | (y == bottom)) & ( x <= right && x >= left) ); // top and bottom are flipped for some reason??
-assign cursor_active = ( x == centre_x ) | ( y == centre_y);
+// assign bb_active = (((x == left) | (x == right)) & ( y <= bottom && y >= top) ) | ( ((y == top) | (y == bottom)) & ( x <= right && x >= left) ); // top and bottom are flipped for some reason??
+assign cursor_active = (( x <= centre_x + CROSSHAIR_SIZE ) & ( x >= centre_x - CROSSHAIR_SIZE ) & (y == centre_y)) |  (( y <= centre_y + CROSSHAIR_SIZE ) & ( y >= centre_y - CROSSHAIR_SIZE ) & (x == centre_x));
 
-assign new_image = (bb_active | cursor_active) ? (cursor_active ? CROSSHAIR_COLOUR : BB_COL) : col_high;
+assign new_image = cursor_active ? CROSSHAIR_COLOUR : col_high;
 
 // Switch output pixels depending on mode switch
 // Don't modify the start-of-packet word - it's a packet discriptor
@@ -147,11 +148,12 @@ reg [31:0] sum_x, sum_y; // assign a bunch of bits since the sum can become quit
 reg [20:0] num_highs; // numbers of detected pixels
 
 //Process bounding box and centering at the end of the frame.
-reg [1:0] msg_state;
+reg [2:0] msg_state;
 reg [10:0] left, right, top, bottom;
 reg [7:0] frame_count;
 reg [10:0] centre_x, centre_y;
 reg [3:0] frame_averaging;
+reg [31:0] prev_x, prev_y, prev_num;
 
 always@(posedge clk) begin
 	if (colour_detect & in_valid) begin	//Update bounds when the pixel is red
@@ -183,6 +185,9 @@ always@(posedge clk) begin
     if (frame_averaging >= AVG_FRAMES) begin
       centre_x <= sum_x / num_highs;
       centre_y <= sum_y / num_highs;
+			prev_x <= sum_x;
+			prev_y <= sum_y;
+			prev_num <= {11'b0,num_highs};
       sum_x <= 0;
       sum_y <= 0;
       num_highs <= 0;
@@ -194,13 +199,13 @@ always@(posedge clk) begin
 		frame_count <= frame_count - 1;
 		
 		if (frame_count == 0 && msg_buf_size < MESSAGE_BUF_MAX - 3) begin
-			msg_state <= 2'b01;
+			msg_state <= 3'b01;
 			frame_count <= MSG_INTERVAL-1;
 		end
 	end
 	
 	//Cycle through message writer states once started
-	if (msg_state != 2'b00) msg_state <= msg_state + 2'b01;
+	if (msg_state != 3'b00) msg_state <= msg_state + 3'b01;
 
 end
 	
@@ -216,20 +221,36 @@ wire msg_buf_empty;
 
 always@(*) begin	//Write words to FIFO as state machine advances
 	case(msg_state)
-		2'b00: begin
+		3'b000: begin
 			msg_buf_in = 32'b0;
 			msg_buf_wr = 1'b0;
 		end
-		2'b01: begin
-			msg_buf_in = `RED_BOX_MSG_ID;	//Message ID
+		3'b001: begin
+			msg_buf_in = `RED_BOX_MSG_ID;
 			msg_buf_wr = 1'b1;
 		end
-		2'b10: begin
-			// msg_buf_in = {5'b0, x_min, 5'b0, y_min};	//Top left coordinate
+		3'b010: begin
+			msg_buf_in = prev_x;
 			msg_buf_wr = 1'b1;
 		end
-		2'b11: begin
-			msg_buf_in = {5'b0, x_max, 5'b0, y_max}; //Bottom right coordinate
+		3'b011: begin
+			msg_buf_in = prev_y;
+			msg_buf_wr = 1'b1;
+		end
+		3'b100: begin
+			msg_buf_in = prev_num;
+			msg_buf_wr = 1'b1;
+		end
+		3'b101: begin
+			msg_buf_in = centre_x;
+			msg_buf_wr = 1'b1;
+		end
+		3'b110: begin
+			msg_buf_in = centre_y;
+			msg_buf_wr = 1'b1;
+		end
+		default: begin
+			msg_buf_in = 32'b0;
 			msg_buf_wr = 1'b1;
 		end
 	endcase

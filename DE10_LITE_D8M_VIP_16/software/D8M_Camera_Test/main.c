@@ -20,11 +20,11 @@
 #define EEE_IMGPROC_ID 2
 #define EEE_IMGPROC_BBCOL 3
 
-#define EXPOSURE_INIT 0x0005a0
+#define EXPOSURE_INIT 0x2d0
 #define EXPOSURE_STEP 0x50
 #define GAIN_INIT 0x040
 #define GAIN_STEP 0x040
-#define THRESH_INIT 0x2d73
+#define THRESH_INIT 0x1d3d
 #define DEFAULT_LEVEL 3
 
 #define MIPI_REG_PHYClkCtl		0x0056
@@ -181,7 +181,7 @@ int main()
 
   // if the MS bit is set then the threshold is begin updated
   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
-  IOWR(0x42000, EEE_IMGPROC_BBCOL,  0xffa100 & 0x0FFFFFFF); // update the colour being detected
+  IOWR(0x42000, EEE_IMGPROC_BBCOL,  0xff2200 & 0x0FFFFFFF); // update the colour being detected
 
   FILE* ser = fopen("/dev/uart_0", "rb+");
   if(ser){
@@ -242,15 +242,31 @@ int main()
     }
 
 
-    // //Read messages from the image processor and print them on the terminal
-    // while ((IORD(0x42000,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
-    //     int word = IORD(0x42000,EEE_IMGPROC_MSG); 			//Get next word from message buffer
-    //   if (fwrite(&word, 4, 1, ser) != 1)
-    //     printf("Error writing to UART");
-    //     if (word == EEE_IMGPROC_MSG_START)				//Newline on message identifier
-    //     printf("\n");
-    //   printf("%08x ",word);
-    // }
+    int msg_num = 0;
+    int x_sum, y_sum, num;
+    double x, y;
+    //Read messages from the image processor and print them on the terminal
+    while ((IORD(0x42000,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
+      int word = IORD(0x42000,EEE_IMGPROC_MSG); 			//Get next word from message buffer
+      if (fwrite(&word, 4, 1, ser) != 1) printf("Error writing to UART");
+      if (word == EEE_IMGPROC_MSG_START)	printf("\n");//Newline on message identifier
+      else {
+        printf("%d ",word);
+        if (msg_num == 0) x_sum = word;
+        if (msg_num == 1) y_sum = word;
+        if (msg_num == 2) num = word;
+
+        msg_num++;
+      }
+    }
+
+    if (msg_num != 0) { // new message arrived
+      x = x_sum / (double) num;
+      y = y_sum / (double) num;
+
+      printf("\n");
+      printf("x: %f, y: %f", x, y);
+    }
 
     usleep(10000);
 
