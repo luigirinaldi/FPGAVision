@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="Qsys" kind="Qsys" version="1.0" fabric="QSYS">
  <!-- Format version 18.1 625 (Future versions may contain additional information.) -->
- <!-- 2023.06.09.14:29:16 -->
+ <!-- 2023.06.10.16:59:27 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
-  <value>1686317356</value>
+  <value>1686412767</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>false</visible>
@@ -6444,15 +6444,21 @@ parameters are a RESULT of the module parameters. -->
    </clockDomainMember>
    <clockDomainMember>
     <isBridge>false</isBridge>
+    <moduleName>uart_0</moduleName>
+    <slaveName>clk</slaveName>
+    <name>uart_0.clk</name>
+   </clockDomainMember>
+   <clockDomainMember>
+    <isBridge>false</isBridge>
     <moduleName>nios2_gen2</moduleName>
     <slaveName>clk</slaveName>
     <name>nios2_gen2.clk</name>
    </clockDomainMember>
    <clockDomainMember>
     <isBridge>false</isBridge>
-    <moduleName>uart_0</moduleName>
+    <moduleName>reset_bridge_0</moduleName>
     <slaveName>clk</slaveName>
-    <name>uart_0.clk</name>
+    <name>reset_bridge_0.clk</name>
    </clockDomainMember>
    <clockDomainMember>
     <isBridge>false</isBridge>
@@ -15839,6 +15845,239 @@ parameters are a RESULT of the module parameters. -->
   </interface>
  </module>
  <module
+   name="reset_bridge_0"
+   kind="altera_reset_bridge"
+   version="18.1"
+   path="reset_bridge_0">
+  <!-- Describes a single module. Module parameters are
+the requested settings for a module instance. -->
+  <parameter name="ACTIVE_LOW_RESET">
+   <type>int</type>
+   <value>0</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="SYNCHRONOUS_EDGES">
+   <type>java.lang.String</type>
+   <value>deassert</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="NUM_RESET_OUTPUTS">
+   <type>int</type>
+   <value>1</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="USE_RESET_REQUEST">
+   <type>int</type>
+   <value>0</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="AUTO_CLK_CLOCK_RATE">
+   <type>java.lang.Long</type>
+   <value>50000000</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>false</visible>
+   <valid>true</valid>
+   <sysinfo_type>CLOCK_RATE</sysinfo_type>
+   <sysinfo_arg>clk</sysinfo_arg>
+  </parameter>
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <interface name="clk" kind="clock_sink" version="18.1">
+   <!-- The connection points exposed by a module instance for the
+particular module parameters. Connection points and their
+parameters are a RESULT of the module parameters. -->
+   <parameter name="externallyDriven">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="ptfSchematicName">
+    <type>java.lang.String</type>
+    <value></value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="deviceFamily">
+    <type>java.lang.String</type>
+    <value>UNKNOWN</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="generateLegacySim">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="clockRateKnown">
+    <type>java.lang.Boolean</type>
+    <value>true</value>
+    <derived>true</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="clockRate">
+    <type>java.lang.Long</type>
+    <value>50000000</value>
+    <derived>true</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <type>clock</type>
+   <isStart>false</isStart>
+   <port>
+    <name>clk</name>
+    <direction>Input</direction>
+    <width>1</width>
+    <role>clk</role>
+   </port>
+  </interface>
+  <interface name="in_reset" kind="reset_sink" version="18.1">
+   <!-- The connection points exposed by a module instance for the
+particular module parameters. Connection points and their
+parameters are a RESULT of the module parameters. -->
+   <parameter name="associatedClock">
+    <type>java.lang.String</type>
+    <value>clk</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="synchronousEdges">
+    <type>com.altera.sopcmodel.reset.Reset$Edges</type>
+    <value>DEASSERT</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="deviceFamily">
+    <type>java.lang.String</type>
+    <value>UNKNOWN</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="generateLegacySim">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <type>reset</type>
+   <isStart>false</isStart>
+   <port>
+    <name>in_reset</name>
+    <direction>Input</direction>
+    <width>1</width>
+    <role>reset</role>
+   </port>
+  </interface>
+  <interface name="out_reset" kind="reset_source" version="18.1">
+   <!-- The connection points exposed by a module instance for the
+particular module parameters. Connection points and their
+parameters are a RESULT of the module parameters. -->
+   <parameter name="associatedClock">
+    <type>java.lang.String</type>
+    <value>clk</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="associatedDirectReset">
+    <type>java.lang.String</type>
+    <value>in_reset</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="associatedResetSinks">
+    <type>[Ljava.lang.String;</type>
+    <value>in_reset</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="synchronousEdges">
+    <type>com.altera.sopcmodel.reset.Reset$Edges</type>
+    <value>DEASSERT</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="deviceFamily">
+    <type>java.lang.String</type>
+    <value>UNKNOWN</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="generateLegacySim">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <type>reset</type>
+   <isStart>true</isStart>
+   <port>
+    <name>out_reset</name>
+    <direction>Output</direction>
+    <width>1</width>
+    <role>reset</role>
+   </port>
+  </interface>
+ </module>
+ <module
    name="sdram"
    kind="altera_avalon_new_sdram_controller"
    version="18.1"
@@ -17594,7 +17833,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.TIMESTAMP</name>
-   <value>1686317356</value>
+   <value>1686412767</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.compatible</name>
@@ -17614,7 +17853,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.dts.params.timestamp</name>
-   <value>1686317356</value>
+   <value>1686412767</value>
   </assignment>
   <assignment>
    <name>embeddedsw.dts.vendor</name>
@@ -17630,7 +17869,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="timestamp">
    <type>int</type>
-   <value>1686317356</value>
+   <value>1686412767</value>
    <derived>true</derived>
    <enabled>false</enabled>
    <visible>false</visible>
@@ -21201,6 +21440,33 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>clk</endConnectionPoint>
  </connection>
  <connection
+   name="clk_50.clk/uart_0.clk"
+   kind="clock"
+   version="18.1"
+   start="clk_50.clk"
+   end="uart_0.clk">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>clk_50</startModule>
+  <startConnectionPoint>clk</startConnectionPoint>
+  <endModule>uart_0</endModule>
+  <endConnectionPoint>clk</endConnectionPoint>
+ </connection>
+ <connection
    name="clk_50.clk/nios2_gen2.clk"
    kind="clock"
    version="18.1"
@@ -21228,11 +21494,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>clk</endConnectionPoint>
  </connection>
  <connection
-   name="clk_50.clk/uart_0.clk"
+   name="clk_50.clk/reset_bridge_0.clk"
    kind="clock"
    version="18.1"
    start="clk_50.clk"
-   end="uart_0.clk">
+   end="reset_bridge_0.clk">
   <parameter name="deviceFamily">
    <type>java.lang.String</type>
    <value>UNKNOWN</value>
@@ -21251,7 +21517,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>clk_50</startModule>
   <startConnectionPoint>clk</startConnectionPoint>
-  <endModule>uart_0</endModule>
+  <endModule>reset_bridge_0</endModule>
   <endConnectionPoint>clk</endConnectionPoint>
  </connection>
  <connection
@@ -21700,33 +21966,6 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
-   name="clk_50.clk_reset/nios2_gen2.reset"
-   kind="reset"
-   version="18.1"
-   start="clk_50.clk_reset"
-   end="nios2_gen2.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>clk_50</startModule>
-  <startConnectionPoint>clk_reset</startConnectionPoint>
-  <endModule>nios2_gen2</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
    name="clk_50.clk_reset/alt_vip_vfb_0.reset"
    kind="reset"
    version="18.1"
@@ -22078,33 +22317,6 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>reset1</endConnectionPoint>
  </connection>
  <connection
-   name="nios2_gen2.debug_reset_request/i2c_opencores_mipi.clock_reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="i2c_opencores_mipi.clock_reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>i2c_opencores_mipi</endModule>
-  <endConnectionPoint>clock_reset</endConnectionPoint>
- </connection>
- <connection
    name="nios2_gen2.debug_reset_request/i2c_opencores_camera.clock_reset"
    kind="reset"
    version="18.1"
@@ -22129,6 +22341,33 @@ parameters are a RESULT of the module parameters. -->
   <startModule>nios2_gen2</startModule>
   <startConnectionPoint>debug_reset_request</startConnectionPoint>
   <endModule>i2c_opencores_camera</endModule>
+  <endConnectionPoint>clock_reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/i2c_opencores_mipi.clock_reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="i2c_opencores_mipi.clock_reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>i2c_opencores_mipi</endModule>
   <endConnectionPoint>clock_reset</endConnectionPoint>
  </connection>
  <connection
@@ -22186,11 +22425,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>is_clk_rst_reset</endConnectionPoint>
  </connection>
  <connection
-   name="nios2_gen2.debug_reset_request/jtag_uart.reset"
+   name="nios2_gen2.debug_reset_request/uart_0.reset"
    kind="reset"
    version="18.1"
    start="nios2_gen2.debug_reset_request"
-   end="jtag_uart.reset">
+   end="uart_0.reset">
   <parameter name="deviceFamily">
    <type>java.lang.String</type>
    <value>UNKNOWN</value>
@@ -22209,304 +22448,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>nios2_gen2</startModule>
   <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>jtag_uart</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/sysid_qsys.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="sysid_qsys.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>sysid_qsys</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/timer.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="timer.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>timer</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/led.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="led.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>led</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/sw.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="sw.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>sw</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/key.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="key.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>key</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/mipi_reset_n.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="mipi_reset_n.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>mipi_reset_n</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/mipi_pwdn_n.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="mipi_pwdn_n.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>mipi_pwdn_n</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/nios2_gen2.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="nios2_gen2.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>nios2_gen2</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/sdram.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="sdram.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>sdram</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/alt_vip_vfb_0.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="alt_vip_vfb_0.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>alt_vip_vfb_0</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
-   name="nios2_gen2.debug_reset_request/TERASIC_AUTO_FOCUS_0.reset"
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="TERASIC_AUTO_FOCUS_0.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>nios2_gen2</startModule>
-  <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>TERASIC_AUTO_FOCUS_0</endModule>
+  <endModule>uart_0</endModule>
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
@@ -22537,11 +22479,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
-   name="nios2_gen2.debug_reset_request/uart_0.reset"
+   name="nios2_gen2.debug_reset_request/TERASIC_AUTO_FOCUS_0.reset"
    kind="reset"
    version="18.1"
    start="nios2_gen2.debug_reset_request"
-   end="uart_0.reset">
+   end="TERASIC_AUTO_FOCUS_0.reset">
   <parameter name="deviceFamily">
    <type>java.lang.String</type>
    <value>UNKNOWN</value>
@@ -22560,7 +22502,304 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>nios2_gen2</startModule>
   <startConnectionPoint>debug_reset_request</startConnectionPoint>
-  <endModule>uart_0</endModule>
+  <endModule>TERASIC_AUTO_FOCUS_0</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/alt_vip_vfb_0.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="alt_vip_vfb_0.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>alt_vip_vfb_0</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/sdram.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="sdram.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>sdram</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/mipi_pwdn_n.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="mipi_pwdn_n.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>mipi_pwdn_n</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/mipi_reset_n.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="mipi_reset_n.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>mipi_reset_n</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/key.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="key.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>key</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/sw.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="sw.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>sw</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/led.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="led.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>led</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/timer.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="timer.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>timer</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/sysid_qsys.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="sysid_qsys.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>sysid_qsys</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/jtag_uart.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="jtag_uart.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>jtag_uart</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="nios2_gen2.debug_reset_request/nios2_gen2.reset"
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="nios2_gen2.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>nios2_gen2</startModule>
+  <startConnectionPoint>debug_reset_request</startConnectionPoint>
+  <endModule>nios2_gen2</endModule>
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
@@ -22590,6 +22829,492 @@ parameters are a RESULT of the module parameters. -->
   <endModule>onchip_memory2_0</endModule>
   <endConnectionPoint>reset1</endConnectionPoint>
  </connection>
+ <connection
+   name="reset_bridge_0.out_reset/i2c_opencores_mipi.clock_reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="i2c_opencores_mipi.clock_reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>i2c_opencores_mipi</endModule>
+  <endConnectionPoint>clock_reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/i2c_opencores_camera.clock_reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="i2c_opencores_camera.clock_reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>i2c_opencores_camera</endModule>
+  <endConnectionPoint>clock_reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/TERASIC_CAMERA_0.clock_reset_reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="TERASIC_CAMERA_0.clock_reset_reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>TERASIC_CAMERA_0</endModule>
+  <endConnectionPoint>clock_reset_reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/alt_vip_itc_0.is_clk_rst_reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="alt_vip_itc_0.is_clk_rst_reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>alt_vip_itc_0</endModule>
+  <endConnectionPoint>is_clk_rst_reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/nios2_gen2.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="nios2_gen2.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>nios2_gen2</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/jtag_uart.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="jtag_uart.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>jtag_uart</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/uart_0.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="uart_0.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>uart_0</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/mipi_pwdn_n.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="mipi_pwdn_n.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>mipi_pwdn_n</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/mipi_reset_n.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="mipi_reset_n.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>mipi_reset_n</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/key.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="key.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>key</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/sw.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="sw.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>sw</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/led.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="led.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>led</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/sysid_qsys.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="sysid_qsys.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>sysid_qsys</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/timer.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="timer.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>timer</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/sdram.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="sdram.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>sdram</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/alt_vip_vfb_0.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="alt_vip_vfb_0.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>alt_vip_vfb_0</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/TERASIC_AUTO_FOCUS_0.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="TERASIC_AUTO_FOCUS_0.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>TERASIC_AUTO_FOCUS_0</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="reset_bridge_0.out_reset/EEE_IMGPROC_0.reset"
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="EEE_IMGPROC_0.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>reset_bridge_0</startModule>
+  <startConnectionPoint>out_reset</startConnectionPoint>
+  <endModule>EEE_IMGPROC_0</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
  <plugin>
   <instanceCount>1</instanceCount>
   <name>EEE_IMGPROC</name>
@@ -22599,7 +23324,7 @@ parameters are a RESULT of the module parameters. -->
   <version>1.0</version>
  </plugin>
  <plugin>
-  <instanceCount>20</instanceCount>
+  <instanceCount>21</instanceCount>
   <name>clock_sink</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
@@ -22607,7 +23332,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.1</version>
  </plugin>
  <plugin>
-  <instanceCount>20</instanceCount>
+  <instanceCount>21</instanceCount>
   <name>reset_sink</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
@@ -22791,7 +23516,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.1</version>
  </plugin>
  <plugin>
-  <instanceCount>1</instanceCount>
+  <instanceCount>2</instanceCount>
   <name>reset_source</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
@@ -22812,6 +23537,14 @@ parameters are a RESULT of the module parameters. -->
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IModule</subtype>
   <displayName>On-Chip Memory (RAM or ROM) Intel FPGA IP</displayName>
+  <version>18.1</version>
+ </plugin>
+ <plugin>
+  <instanceCount>1</instanceCount>
+  <name>altera_reset_bridge</name>
+  <type>com.altera.entityinterfaces.IElementClass</type>
+  <subtype>com.altera.entityinterfaces.IModule</subtype>
+  <displayName>Reset Bridge</displayName>
   <version>18.1</version>
  </plugin>
  <plugin>
@@ -22863,7 +23596,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.1</version>
  </plugin>
  <plugin>
-  <instanceCount>20</instanceCount>
+  <instanceCount>21</instanceCount>
   <name>clock</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IConnection</subtype>
@@ -22879,7 +23612,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.1</version>
  </plugin>
  <plugin>
-  <instanceCount>39</instanceCount>
+  <instanceCount>56</instanceCount>
   <name>reset</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IConnection</subtype>

@@ -284,6 +284,14 @@
          type = "String";
       }
    }
+   element reset_bridge_0
+   {
+      datum _sortIndex
+      {
+         value = "21";
+         type = "int";
+      }
+   }
    element sdram
    {
       datum _sortIndex
@@ -451,6 +459,11 @@
    type="conduit"
    dir="end" />
  <interface name="reset" internal="clk_50.clk_in_reset" type="reset" dir="end" />
+ <interface
+   name="reset_0"
+   internal="reset_bridge_0.in_reset"
+   type="reset"
+   dir="end" />
  <interface name="sdram_wire" internal="sdram.wire" type="conduit" dir="end" />
  <interface
    name="sw_external_connection"
@@ -1006,6 +1019,17 @@
   <parameter name="writable" value="true" />
  </module>
  <module
+   name="reset_bridge_0"
+   kind="altera_reset_bridge"
+   version="18.1"
+   enabled="1">
+  <parameter name="ACTIVE_LOW_RESET" value="0" />
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="50000000" />
+  <parameter name="NUM_RESET_OUTPUTS" value="1" />
+  <parameter name="SYNCHRONOUS_EDGES" value="deassert" />
+  <parameter name="USE_RESET_REQUEST" value="0" />
+ </module>
+ <module
    name="sdram"
    kind="altera_avalon_new_sdram_controller"
    version="18.1"
@@ -1317,8 +1341,13 @@
  <connection kind="clock" version="18.1" start="clk_50.clk" end="key.clk" />
  <connection kind="clock" version="18.1" start="clk_50.clk" end="mipi_reset_n.clk" />
  <connection kind="clock" version="18.1" start="clk_50.clk" end="mipi_pwdn_n.clk" />
- <connection kind="clock" version="18.1" start="clk_50.clk" end="nios2_gen2.clk" />
  <connection kind="clock" version="18.1" start="clk_50.clk" end="uart_0.clk" />
+ <connection kind="clock" version="18.1" start="clk_50.clk" end="nios2_gen2.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="clk_50.clk"
+   end="reset_bridge_0.clk" />
  <connection
    kind="clock"
    version="18.1"
@@ -1408,11 +1437,6 @@
    kind="reset"
    version="18.1"
    start="clk_50.clk_reset"
-   end="nios2_gen2.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="clk_50.clk_reset"
    end="alt_vip_vfb_0.reset" />
  <connection
    kind="reset"
@@ -1466,12 +1490,12 @@
    kind="reset"
    version="18.1"
    start="nios2_gen2.debug_reset_request"
-   end="i2c_opencores_mipi.clock_reset" />
+   end="i2c_opencores_camera.clock_reset" />
  <connection
    kind="reset"
    version="18.1"
    start="nios2_gen2.debug_reset_request"
-   end="i2c_opencores_camera.clock_reset" />
+   end="i2c_opencores_mipi.clock_reset" />
  <connection
    kind="reset"
    version="18.1"
@@ -1486,62 +1510,7 @@
    kind="reset"
    version="18.1"
    start="nios2_gen2.debug_reset_request"
-   end="jtag_uart.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="sysid_qsys.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="timer.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="led.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="sw.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="key.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="mipi_reset_n.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="mipi_pwdn_n.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="nios2_gen2.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="sdram.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="alt_vip_vfb_0.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="nios2_gen2.debug_reset_request"
-   end="TERASIC_AUTO_FOCUS_0.reset" />
+   end="uart_0.reset" />
  <connection
    kind="reset"
    version="18.1"
@@ -1551,12 +1520,157 @@
    kind="reset"
    version="18.1"
    start="nios2_gen2.debug_reset_request"
-   end="uart_0.reset" />
+   end="TERASIC_AUTO_FOCUS_0.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="alt_vip_vfb_0.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="sdram.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="mipi_pwdn_n.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="mipi_reset_n.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="key.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="sw.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="led.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="timer.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="sysid_qsys.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="jtag_uart.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="nios2_gen2.debug_reset_request"
+   end="nios2_gen2.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="nios2_gen2.debug_reset_request"
    end="onchip_memory2_0.reset1" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="i2c_opencores_mipi.clock_reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="i2c_opencores_camera.clock_reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="TERASIC_CAMERA_0.clock_reset_reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="alt_vip_itc_0.is_clk_rst_reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="nios2_gen2.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="jtag_uart.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="uart_0.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="mipi_pwdn_n.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="mipi_reset_n.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="key.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="sw.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="led.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="sysid_qsys.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="timer.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="sdram.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="alt_vip_vfb_0.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="TERASIC_AUTO_FOCUS_0.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="reset_bridge_0.out_reset"
+   end="EEE_IMGPROC_0.reset" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />

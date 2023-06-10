@@ -197,7 +197,7 @@ int main()
 
   // // if (fwrite(test, 1, 6, ser) != 1) printf("Error writing to UART")
   int write_code;
-  if ( (write_code = fprintf(ser, "hello from nios!\n")) <= -0 ) printf("Error writing to UART\n"); 
+  if ( (write_code = fprintf(ser, "Hello from nios!\n")) <= -0 ) printf("Error writing to UART\n"); 
   else printf("Wrote to UART with code: %d\n", write_code);
 
   int esp_read;

@@ -179,7 +179,9 @@ Qsys u0 (
 		.eee_imgproc_0_conduit_mode_new_signal     (SW[1]),
 		
 		.uart_0_rx_tx_rxd                          (ARDUINO_IO[8]),                          //                     uart_0_rx_tx.rxd
-		.uart_0_rx_tx_txd                          (ARDUINO_IO[9])                           //
+		.uart_0_rx_tx_txd                          (ARDUINO_IO[9]),                          //
+		
+		.reset_0_reset									 			 (ARDUINO_IO[6])				// 	reset pin to be triggered with connected ESP-32 GPIO PIN 18
 	);
 
 FpsMonitor uFps(

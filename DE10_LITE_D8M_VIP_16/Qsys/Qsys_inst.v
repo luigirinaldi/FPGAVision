@@ -24,6 +24,7 @@
 		.mipi_pwdn_n_external_connection_export    (<connected-to-mipi_pwdn_n_external_connection_export>),    //  mipi_pwdn_n_external_connection.export
 		.mipi_reset_n_external_connection_export   (<connected-to-mipi_reset_n_external_connection_export>),   // mipi_reset_n_external_connection.export
 		.reset_reset_n                             (<connected-to-reset_reset_n>),                             //                            reset.reset_n
+		.reset_0_reset                             (<connected-to-reset_0_reset>),                             //                          reset_0.reset
 		.sdram_wire_addr                           (<connected-to-sdram_wire_addr>),                           //                       sdram_wire.addr
 		.sdram_wire_ba                             (<connected-to-sdram_wire_ba>),                             //                                 .ba
 		.sdram_wire_cas_n                          (<connected-to-sdram_wire_cas_n>),                          //                                 .cas_n

@@ -25,6 +25,7 @@
 			mipi_pwdn_n_external_connection_export    : out   std_logic;                                        -- export
 			mipi_reset_n_external_connection_export   : out   std_logic;                                        -- export
 			reset_reset_n                             : in    std_logic                     := 'X';             -- reset_n
+			reset_0_reset                             : in    std_logic                     := 'X';             -- reset
 			sdram_wire_addr                           : out   std_logic_vector(12 downto 0);                    -- addr
 			sdram_wire_ba                             : out   std_logic_vector(1 downto 0);                     -- ba
 			sdram_wire_cas_n                          : out   std_logic;                                        -- cas_n
@@ -74,6 +75,7 @@
 			mipi_pwdn_n_external_connection_export    => CONNECTED_TO_mipi_pwdn_n_external_connection_export,    --  mipi_pwdn_n_external_connection.export
 			mipi_reset_n_external_connection_export   => CONNECTED_TO_mipi_reset_n_external_connection_export,   -- mipi_reset_n_external_connection.export
 			reset_reset_n                             => CONNECTED_TO_reset_reset_n,                             --                            reset.reset_n
+			reset_0_reset                             => CONNECTED_TO_reset_0_reset,                             --                          reset_0.reset
 			sdram_wire_addr                           => CONNECTED_TO_sdram_wire_addr,                           --                       sdram_wire.addr
 			sdram_wire_ba                             => CONNECTED_TO_sdram_wire_ba,                             --                                 .ba
 			sdram_wire_cas_n                          => CONNECTED_TO_sdram_wire_cas_n,                          --                                 .cas_n

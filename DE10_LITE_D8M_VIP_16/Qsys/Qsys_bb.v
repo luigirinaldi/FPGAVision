@@ -25,6 +25,7 @@ module Qsys (
 	mipi_pwdn_n_external_connection_export,
 	mipi_reset_n_external_connection_export,
 	reset_reset_n,
+	reset_0_reset,
 	sdram_wire_addr,
 	sdram_wire_ba,
 	sdram_wire_cas_n,
@@ -70,6 +71,7 @@ module Qsys (
 	output		mipi_pwdn_n_external_connection_export;
 	output		mipi_reset_n_external_connection_export;
 	input		reset_reset_n;
+	input		reset_0_reset;
 	output	[12:0]	sdram_wire_addr;
 	output	[1:0]	sdram_wire_ba;
 	output		sdram_wire_cas_n;
