@@ -123,153 +123,206 @@ bool MIPI_Init(void){
 int main()
 {
 
-	fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
+// 	fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
 
-  printf("DE10-LITE D8M VGA Demo\n");
-  printf("Imperial College EEE2 Project version\n");
-  IOWR(MIPI_PWDN_N_BASE, 0x00, 0x00);
-  IOWR(MIPI_RESET_N_BASE, 0x00, 0x00);
+  printf("DE10-LITE D8M\n");
+  printf("Imperial College EEE2 Magenta Project\n");
+//   IOWR(MIPI_PWDN_N_BASE, 0x00, 0x00);
+//   IOWR(MIPI_RESET_N_BASE, 0x00, 0x00);
 
-  usleep(2000);
-  IOWR(MIPI_PWDN_N_BASE, 0x00, 0xFF);
-  usleep(2000);
-  IOWR(MIPI_RESET_N_BASE, 0x00, 0xFF);
+//   usleep(2000);
+//   IOWR(MIPI_PWDN_N_BASE, 0x00, 0xFF);
+//   usleep(2000);
+//   IOWR(MIPI_RESET_N_BASE, 0x00, 0xFF);
 
-  printf("Image Processor ID: %x\n",IORD(0x42000,EEE_IMGPROC_ID));
-  //printf("Image Processor ID: %x\n",IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_ID)); //Don't know why this doesn't work - definition is in system.h in BSP
-
-
-  usleep(2000);
+//   printf("Image Processor ID: %x\n",IORD(0x42000,EEE_IMGPROC_ID));
+//   //printf("Image Processor ID: %x\n",IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_ID)); //Don't know why this doesn't work - definition is in system.h in BSP
 
 
-  // MIPI Init
-   if (!MIPI_Init()){
-	  printf("MIPI_Init Init failed!\r\n");
-  }else{
-	  printf("MIPI_Init Init successfully!\r\n");
-  }
+//   usleep(2000);
 
-//   while(1){
- 	    mipi_clear_error();
-	 	usleep(50*1000);
- 	    mipi_clear_error();
-	 	usleep(1000*1000);
-	    mipi_show_error_info();
-//	    mipi_show_error_info_more();
-	    printf("\n");
+
+//   // MIPI Init
+//    if (!MIPI_Init()){
+// 	  printf("MIPI_Init Init failed!\r\n");
+//   }else{
+// 	  printf("MIPI_Init Init successfully!\r\n");
 //   }
 
+// //   while(1){
+//  	    mipi_clear_error();
+// 	 	usleep(50*1000);
+//  	    mipi_clear_error();
+// 	 	usleep(1000*1000);
+// 	    mipi_show_error_info();
+// //	    mipi_show_error_info_more();
+// 	    printf("\n");
+// //   }
 
 
 
 
 
-    //////////////////////////////////////////////////////////
-  alt_u16 bin_level = DEFAULT_LEVEL;
-  alt_u8  manual_focus_step = 10;
-  alt_u16  current_focus = 300;
-  int boundingBoxColour = 0;
-  alt_u32 exposureTime = EXPOSURE_INIT;
-  alt_u16 gain = GAIN_INIT;
 
-  alt_u16 colour_threshold = THRESH_INIT;
-  alt_u8  colour_thresh_step = 50;
+//     //////////////////////////////////////////////////////////
+//   alt_u16 bin_level = DEFAULT_LEVEL;
+//   alt_u8  manual_focus_step = 10;
+//   alt_u16  current_focus = 300;
+//   int boundingBoxColour = 0;
+//   alt_u32 exposureTime = EXPOSURE_INIT;
+//   alt_u16 gain = GAIN_INIT;
 
-  OV8865SetExposure(exposureTime);
-  OV8865SetGain(gain);
-  // Focus_Init();
+//   alt_u16 colour_threshold = THRESH_INIT;
+//   alt_u8  colour_thresh_step = 50;
 
-  // if the MS bit is set then the threshold is begin updated
-  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
-  IOWR(0x42000, EEE_IMGPROC_BBCOL,  0xff2200 & 0x0FFFFFFF); // update the colour being detected
+//   OV8865SetExposure(exposureTime);
+//   OV8865SetGain(gain);
+//   // Focus_Init();
 
-  FILE* ser = fopen("/dev/uart_0", "rb+");
+//   // if the MS bit is set then the threshold is begin updated
+//   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x00 << 30) | colour_threshold); // update the threshold for colour detection
+//   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x01 << 30) | 0xff2200); // update the colour being detected
+//   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x10 << 30) | 10); // update the number 
+
+  // printf("TEST!\n");
+
+
+  FILE* ser = fopen("/dev/uart_0", "rb+"); // use this only for writing
   if(ser){
-    printf("Opened UART\n");
+    printf("Opened UART for writing\n");
   } else {
-    printf("Failed to open UART\n");
+    printf("Failed to open UART for writing\n");
     while (1);
   }
 
+  // // if (fwrite(test, 1, 6, ser) != 1) printf("Error writing to UART")
+  int write_code;
+  if ( (write_code = fprintf(ser, "hello from nios!\n")) <= -0 ) printf("Error writing to UART\n"); 
+  else printf("Wrote to UART with code: %d\n", write_code);
+
+  int esp_read;
+  esp_read = open("/dev/uart_0", O_RDONLY | O_NONBLOCK);
+
+  if (esp_read == -1){
+    printf("Failed to open UART for reading\n");
+  } else printf("Opened UART read\n");
+
+  char *incoming_char;
+  int c;
+
   while(1){
-    
-    //Process input commands
-    int in = getchar();
-    switch (in) {
-        case 'e': {
-          exposureTime += EXPOSURE_STEP;
-          OV8865SetExposure(exposureTime);
-          printf("\nExposure = %x ", exposureTime);
-            break;}
-        case 'd': {
-          exposureTime -= EXPOSURE_STEP;
-          OV8865SetExposure(exposureTime);
-          printf("\nExposure = %x ", exposureTime);
-            break;}
-        case 't': {
-          gain += GAIN_STEP;
-          OV8865SetGain(gain);
-          printf("\nGain = %x ", gain);
-            break;}
-        case 'g': {
-          gain -= GAIN_STEP;
-          OV8865SetGain(gain);
-          printf("\nGain = %x ", gain);
-            break;}
-        case 'r': {
-          current_focus += manual_focus_step;
-          if(current_focus >1023) current_focus = 1023;
-          OV8865_FOCUS_Move_to(current_focus);
-          printf("\nFocus = %x ",current_focus);
-            break;}
-        case 'f': {
-          if(current_focus > manual_focus_step) current_focus -= manual_focus_step;
-          OV8865_FOCUS_Move_to(current_focus);
-          printf("\nFocus = %x ",current_focus);
-            break;}
-        case 'w': {
-          colour_threshold += colour_thresh_step;
-          if(colour_threshold > 0x0FFFFFFF) colour_threshold = 0x0FFFFFFF;
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
-          printf("\nColour Thresh = %x ",colour_threshold);
-            break;}
-        case 's': {
-          colour_threshold -= colour_thresh_step;
-          if (colour_threshold < 0) colour_threshold = 0;
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
-          printf("\nColour Thresh = %x ",colour_threshold);
-            break;}
-    }
+
+    // printf("Waiting for message \n");
+    // fgets(incomeString, 10, ser);
 
 
-    int msg_num = 0;
-    int x_sum, y_sum, num;
-    double x, y;
-    //Read messages from the image processor and print them on the terminal
-    while ((IORD(0x42000,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
-      int word = IORD(0x42000,EEE_IMGPROC_MSG); 			//Get next word from message buffer
-      if (fwrite(&word, 4, 1, ser) != 1) printf("Error writing to UART");
-      if (word == EEE_IMGPROC_MSG_START)	printf("\n");//Newline on message identifier
-      else {
-        printf("%d ",word);
-        if (msg_num == 0) x_sum = word;
-        if (msg_num == 1) y_sum = word;
-        if (msg_num == 2) num = word;
-
-        msg_num++;
+    c = read(esp_read, incoming_char, 1);
+    if (c > 0) {
+      int i = 1;
+      printf("%c", *incoming_char);
+      while (*incoming_char != '\n') {
+        if ((c = read(esp_read, incoming_char, 1)) > 0) {
+          printf("%c", *incoming_char);
+          i++;
+        }
       }
-    }
+      printf("\nReceived %d bytes\n", i);
+    } 
 
-    if (msg_num != 0) { // new message arrived
-      x = x_sum / (double) num;
-      y = y_sum / (double) num;
+    // if (c != 0) {
+    //   printf("Start reading uart, %d\n", c);
+    //   // int i = 0;
+    //   // while (!feof(ser)){
+    //   //   // incomeString[i++] = c;
+    //   //   fputc(c, ser);
+    //   //   c = fgetc(ser);
+    //   // }
 
-      printf("\n");
-      printf("x: %f, y: %f", x, y);
-    }
+    //   printf("Received: %s\n", incomeString);
+    // } else printf(".");
 
-    usleep(10000);
+    usleep(3000);
+  }
 
-   };
+  // while(1){
+    
+  //   //Process input commands
+  //   int in = getchar();
+  //   switch (in) {
+  //       case 'e': {
+  //         exposureTime += EXPOSURE_STEP;
+  //         OV8865SetExposure(exposureTime);
+  //         printf("\nExposure = %x ", exposureTime);
+  //           break;}
+  //       case 'd': {
+  //         exposureTime -= EXPOSURE_STEP;
+  //         OV8865SetExposure(exposureTime);
+  //         printf("\nExposure = %x ", exposureTime);
+  //           break;}
+  //       case 't': {
+  //         gain += GAIN_STEP;
+  //         OV8865SetGain(gain);
+  //         printf("\nGain = %x ", gain);
+  //           break;}
+  //       case 'g': {
+  //         gain -= GAIN_STEP;
+  //         OV8865SetGain(gain);
+  //         printf("\nGain = %x ", gain);
+  //           break;}
+  //       case 'r': {
+  //         current_focus += manual_focus_step;
+  //         if(current_focus >1023) current_focus = 1023;
+  //         OV8865_FOCUS_Move_to(current_focus);
+  //         printf("\nFocus = %x ",current_focus);
+  //           break;}
+  //       case 'f': {
+  //         if(current_focus > manual_focus_step) current_focus -= manual_focus_step;
+  //         OV8865_FOCUS_Move_to(current_focus);
+  //         printf("\nFocus = %x ",current_focus);
+  //           break;}
+  //       case 'w': {
+  //         colour_threshold += colour_thresh_step;
+  //         if(colour_threshold > 0x0FFFFFFF) colour_threshold = 0x0FFFFFFF;
+  //         IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
+  //         printf("\nColour Thresh = %x ",colour_threshold);
+  //           break;}
+  //       case 's': {
+  //         colour_threshold -= colour_thresh_step;
+  //         if (colour_threshold < 0) colour_threshold = 0;
+  //         IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
+  //         printf("\nColour Thresh = %x ",colour_threshold);
+  //           break;}
+  //   }
+
+
+  //   int msg_num = 0;
+  //   int x_sum, y_sum, num;
+  //   double x, y;
+  //   //Read messages from the image processor and print them on the terminal
+  //   while ((IORD(0x42000,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
+  //     int word = IORD(0x42000,EEE_IMGPROC_MSG); 			//Get next word from message buffer
+  //     // if (fwrite(&word, 4, 1, ser) != 1) printf("Error writing to UART");
+  //     if (word == EEE_IMGPROC_MSG_START)	printf("\n");//Newline on message identifier
+  //     else {
+  //       printf("%d ",word);
+  //       if (msg_num == 0) x_sum = word;
+  //       if (msg_num == 1) y_sum = word;
+  //       if (msg_num == 2) num = word;
+
+  //       msg_num++;
+  //     }
+  //   }
+
+  //   if (msg_num != 0) { // new message arrived
+  //     x = x_sum / (double) num;
+  //     y = y_sum / (double) num;
+
+  //     printf("\n");
+  //     printf("x: %f, y: %f", x, y);
+  //   }
+
+  //   usleep(10000);
+
+  //  };
   return 0;
 }
