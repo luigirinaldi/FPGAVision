@@ -153,7 +153,7 @@ reg [20:0] num_highs; // numbers of detected pixels
 reg [2:0] msg_state;
 reg [7:0] frame_count;
 reg [10:0] centre_x, centre_y;
-reg [3:0] frame_averaging, max_num_frames;
+reg [9:0] frame_averaging, max_num_frames;
 reg [31:0] prev_x, prev_y, prev_num;
 
 always@(posedge clk) begin
@@ -332,7 +332,7 @@ begin
         case(s_writedata[31:30])
           2'b00:  col_detect_thresh <= s_writedata[17:0]; // update threshold
           2'b01:  des_colour <= s_writedata[23:0]; // update colour
-          2'b10:  max_num_frames <= s_writedata[15:0]; // update averaging  
+          2'b10:  max_num_frames <= s_writedata[9:0]; // update averaging  
         endcase
       end 
     end
