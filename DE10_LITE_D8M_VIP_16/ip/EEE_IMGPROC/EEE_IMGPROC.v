@@ -332,7 +332,7 @@ begin
         case(s_writedata[31:30])
           2'b00:  col_detect_thresh <= s_writedata[17:0]; // update threshold
           2'b01:  des_colour <= s_writedata[23:0]; // update colour
-          2'b10:  max_num_frames <= s_writedata[15:0];
+          2'b10:  max_num_frames <= s_writedata[15:0]; // update averaging  
         endcase
       end 
     end
