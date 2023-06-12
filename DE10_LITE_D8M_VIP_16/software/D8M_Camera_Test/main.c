@@ -348,8 +348,8 @@ int main()
 
 
     int msg_num = 0;
-    int x_sum, y_sum, num, hw_x, hw_y;
-    double x, y;
+    int x_sum, y_sum, num, hw_x, hw_y, left, right, bottom, top;
+    double x, y, x_b, y_b;
     //Read messages from the image processor and print them on the terminal
     while ((IORD(0x42000,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
       int word = IORD(0x42000,EEE_IMGPROC_MSG); 			//Get next word from message buffer
@@ -360,8 +360,19 @@ int main()
         if (msg_num == 0) x_sum = word;
         else if (msg_num == 1) y_sum = word;
         else if (msg_num == 2) num = word;
-        else if (msg_num == 3) hw_x = word;
-        else if (msg_num == 4) hw_y = word;
+        else if (msg_num == 3) {
+          hw_x = word >> 16;
+          hw_y = word & 0xFFFF;
+        }
+        else if (msg_num == 4) {
+          left = word >> 16;
+          right = word & 0xFFFF;
+        }
+        else if (msg_num == 5) {
+          bottom = word >> 16;
+          top = word & 0xFFFF;
+        }
+
 
         msg_num++;
       }
@@ -371,11 +382,14 @@ int main()
       x = x_sum / (double) num;
       y = y_sum / (double) num;
 
+      x_b = (double) (left + right) / 2;
+      y_b = (double) (bottom + top) / 2;
+
       printf("\n");
-      printf("x: %f, y: %f", x, y);
+      printf("x: %.2f, y: %.2f| bb x: %.2f, y: %.2f| hw x:%i, y:%i", x, y, x_b, y_b, hw_x, hw_y);
     }
 
-    usleep(10000);
+    usleep(1000);
 
    };
   return 0;

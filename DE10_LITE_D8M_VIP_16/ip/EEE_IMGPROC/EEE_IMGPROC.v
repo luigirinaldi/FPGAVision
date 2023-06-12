@@ -59,7 +59,7 @@ output								source_sop;
 output								source_eop;
 
 // conduit export
-input                         mode;
+input  [7:0]                       mode;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -114,15 +114,15 @@ wire cursor_active;
 
 
 // Find boundary of cursor box
-// assign bb_active = (((x == left) | (x == right)) & ( y <= bottom && y >= top) ) | ( ((y == top) | (y == bottom)) & ( x <= right && x >= left) ); // top and bottom are flipped for some reason??
+assign bb_active = (((x == left) | (x == right)) & ( y <= bottom && y >= top) ) | ( ((y == top) | (y == bottom)) & ( x <= right && x >= left) ); // top and bottom are flipped for some reason??
 assign cursor_active = (( x <= centre_x + CROSSHAIR_SIZE ) & ( x >= centre_x - CROSSHAIR_SIZE ) & (y == centre_y)) |  (( y <= centre_y + CROSSHAIR_SIZE ) & ( y >= centre_y - CROSSHAIR_SIZE ) & (x == centre_x));
 
-assign new_image = cursor_active ? CROSSHAIR_COLOUR : col_high;
+assign new_image = (cursor_active |  bb_active) ? CROSSHAIR_COLOUR : col_high;
 
 // Switch output pixels depending on mode switch
 // Don't modify the start-of-packet word - it's a packet discriptor
 // Don't modify data in non-video packets
-assign {red_out, green_out, blue_out} = (mode & ~sop & packet_video) ? new_image : {red,green,blue};
+assign {red_out, green_out, blue_out} = (mode[0] & ~sop & packet_video) ? new_image : {red,green,blue};
 
 //Count valid pixels to get the image coordinates. Reset and detect packet type on Start of Packet.
 reg [10:0] x, y;
@@ -146,6 +146,7 @@ end
 
 //Find first and last red pixels
 reg [10:0] x_min, y_min, x_max, y_max;
+reg [10:0] left, right, top, bottom;
 reg [31:0] sum_x, sum_y; // assign a bunch of bits since the sum can become quite large
 reg [20:0] num_highs; // numbers of detected pixels
 
@@ -157,29 +158,27 @@ reg [9:0] frame_averaging, max_num_frames;
 reg [31:0] prev_x, prev_y, prev_num;
 
 always@(posedge clk) begin
-  if (colour_detect & in_valid) begin	//Update bounds when the pixel is red
-    num_highs <= num_highs + 1; // increment number of total detected pixels
+  if (colour_detect & in_valid & ~sop) begin	//Update bounds when the pixel is red
+    num_highs <= num_highs + 1'b1; // increment number of total detected pixels
     // increment sums
     sum_x <= sum_x + x;
     sum_y <= sum_y + y;
+
+    // BOUNDING BOX LOGIC
+    if (x < x_min) x_min <= x;
+		if (x > x_max) x_max <= x;
+		if (y < y_min) y_min <= y;
+		y_max <= y;	// because y is always increasing
   end
 
   // REMNANTS FROM BOUNDING BOX
-  // if (sop & in_valid) begin	//Reset bounds on start of packet
-  // 	x_min <= IMAGE_W-11'h1;
-  // 	x_max <= 0;
-  // 	y_min <= IMAGE_H-11'h1;
-  // 	y_max <= 0;
-  // end
+  if (sop & in_valid) begin	//Reset bounds on start of packet
+  	x_min <= IMAGE_W-11'h1;
+  	x_max <= 0;
+  	y_min <= IMAGE_H-11'h1;
+  	y_max <= 0;
 
-  if (eop & in_valid & packet_video) begin  //Ignore non-video packets
-    
-    //Latch edges for display overlay on next frame
-    // left <= x_min;
-    // right <= x_max;
-    // top <= y_min;
-    // bottom <= y_max;
-    
+
     if (frame_averaging >= max_num_frames) begin
       centre_x <= sum_x / num_highs;
       centre_y <= sum_y / num_highs;
@@ -189,9 +188,22 @@ always@(posedge clk) begin
       sum_x <= 0;
       sum_y <= 0;
       num_highs <= 0;
+      
       frame_averaging <= 0;
     end
-    else frame_averaging <= frame_averaging + 1;
+    else frame_averaging <= frame_averaging + 1'b1;
+
+  end
+
+  if (eop & in_valid & packet_video) begin  //Ignore non-video packets
+    
+    // Latch edges for display overlay on next frame
+    left <= x_min;
+    right <= x_max;
+    top <= y_min;
+    bottom <= y_max;
+    
+    
     
     //Start message writer FSM once every MSG_INTERVAL frames, if there is room in the FIFO
     frame_count <= frame_count - 1;
@@ -240,15 +252,15 @@ always@(*) begin	//Write words to FIFO as state machine advances
       msg_buf_wr = 1'b1;
     end
     3'b101: begin
-      msg_buf_in = centre_x;
+      msg_buf_in = {5'b0, centre_x, 5'b0, centre_y};
       msg_buf_wr = 1'b1;
     end
     3'b110: begin
-      msg_buf_in = centre_y;
+      msg_buf_in = {5'b0, left, 5'b0, right};
       msg_buf_wr = 1'b1;
     end
-    default: begin
-      msg_buf_in = 32'b0;
+    3'b111: begin
+      msg_buf_in = {5'b0, bottom, 5'b0, top};
       msg_buf_wr = 1'b1;
     end
   endcase
