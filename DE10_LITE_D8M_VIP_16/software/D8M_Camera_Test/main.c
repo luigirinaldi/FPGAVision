@@ -12,10 +12,14 @@
 #include <unistd.h>
 
 // debug
-#define DEBUG FALSE
+#define DEBUG TRUE
 
 //EEE_IMGPROC defines
 #define EEE_IMGPROC_MSG_START ('R'<<16 | 'B'<<8 | 'B')
+
+// BEACONS defines
+#define MAX_AVG 100
+#define NUM_PIX_THRESH 10
 
 //offsets
 #define EEE_IMGPROC_STATUS 0
@@ -178,11 +182,6 @@ int main()
 	    printf("\n");
 //   }
 
-
-
-
-
-
   //////////////////////////////////////////////////////////
   alt_u16 bin_level = DEFAULT_LEVEL;
   alt_u8  manual_focus_step = 10;
@@ -193,29 +192,30 @@ int main()
 
   alt_u16 colour_threshold = THRESH_INIT;
   alt_u8  colour_thresh_step = 50;
+  alt_u32 colour = 0xff2200;
+  int min_pixel_thresh = NUM_PIX_THRESH;
 
+  // SET DEFAULT SETTINGS
   OV8865SetExposure(exposureTime);
   OV8865SetGain(gain);
   // Focus_Init();
 
   // if the MS bit is set then the threshold is begin updated
   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b00 << 30) | colour_threshold); // update the threshold for colour detection
-  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b01 << 30) | 0xff2200); // update the colour being detected
+  IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b01 << 30) | colour); // update the colour being detected
   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b10 << 30) | 10); // update the number 
 
 
-
-  FILE* ser = fopen("/dev/uart_0", "rb+"); // use this only for writing
-  if(ser){
+  FILE* esp_write = fopen("/dev/uart_0", "wb+"); // use this only for writing
+  if(esp_write){
     printf("Opened UART for writing\n");
   } else {
     printf("Failed to open UART for writing\n");
     while (1);
   }
 
-  // // if (fwrite(test, 1, 6, ser) != 1) printf("Error writing to UART")
   int write_code;
-  if ( (write_code = fprintf(ser, "Hello from nios!\n")) <= -0 ) printf("Error writing to UART\n"); 
+  if ( (write_code = fprintf(esp_write, "Hello from nios!\n")) <= 0 ) printf("Error writing to UART\n"); 
   else printf("Wrote to UART with code: %d\n", write_code);
 
   int esp_read;
@@ -227,6 +227,15 @@ int main()
 
   char incoming_char;
   int c;
+
+  // rolling average
+  float beacon_xs[MAX_AVG];
+  int beacon_pntr = 0;
+  int num_avg;
+  float beacon_x;
+  bool saturated = FALSE;
+  int saturation = 0;
+  bool awaiting_pos = FALSE;
 
   printf("Entering main loop\n");
 
@@ -240,123 +249,97 @@ int main()
         printf("First:%c/\\", incoming_char);
       #endif
 
-      int val = 0;
-      char next_char = 0;
+      if (incoming_char != 'B') { // handle camera and colour setting requests
+        int val = 0;
+        char next_char = 0;
 
-      c = read(esp_read, &next_char, 1);
-      while (next_char != '\n') {
-        if (c > 0) {
-          val = val << 4 | hex2int(next_char);
-
-          #if DEBUG          
-            printf("|%c, %d|", next_char, hex2int(next_char));
-          #endif
-        }
         c = read(esp_read, &next_char, 1);
-      }
-      #if DEBUG
-        printf("\nFinished reading\n");
-      #endif
-      printf("ESP %c: %08x", incoming_char, val);
+        while (next_char != '\n') {
+          if (c > 0) {
+            val = val << 4 | hex2int(next_char);
 
-      switch(incoming_char){
-        case 'E': {
-          OV8865SetExposure(val);
-          printf("\nExposure = %x \n", val);
-          break;
+            #if DEBUG          
+              printf("|%c, %d|", next_char, hex2int(next_char));
+            #endif
+          }
+          c = read(esp_read, &next_char, 1);
         }
-        case 'G': {
-          OV8865SetGain(val);
-          printf("\nGain = %x ", val);
-          break;
+        #if DEBUG
+          printf("\nFinished reading\n");
+        #endif
+        printf("ESP %c: %08x\n", incoming_char, val);
+
+        switch(incoming_char){
+          case 'E': {
+            OV8865SetExposure(val);
+            printf("\nExposure = %x", val);
+            break;
+          }
+          case 'G': {
+            OV8865SetGain(val);
+            printf("\nGain = %x ", val);
+            break;
+          }
+          case 'H': {
+            IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b01 << 30) | ((0x3FFFFFFF >> 2) & val)); // update the colour being detected
+            colour = val;
+            printf("\nColour = %x ", val);
+            break;
+          }
+          case 'T': {
+            IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b00 << 30) | ((0x3FFFFFFF >> 2) & val)); // update the colour being detected
+            printf("\nColour Threshold= %x ", val);
+            break;
+          }
+          case 'F': {
+            OV8865_FOCUS_Move_to(val); // update the colour being detected
+            printf("\nFocus= %x ", val);
+            break;
+          }
+          case 'A': {
+            if (val <= MAX_AVG) num_avg = val;
+            else num_avg = MAX_AVG;
+            // reset the buffer and corresponding vars
+            memset(beacon_xs, 0, sizeof beacon_xs);
+            saturation = 0;
+            saturated = FALSE;
+            printf("\nFrame Averaging= %x ", val);
+            break;
+          }
+          case 'P': {
+            min_pixel_thresh = val;
+            printf("\nMin pixel Threshold= %x ", min_pixel_thresh);
+            break;
+          }
+          default: {
+            printf("\nInvalid Command");
+            break;
+          }
+          // printf("\n");  
         }
-        case 'H': {
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b01 << 30) | ((0x3FFFFFFF >> 2) & val)); // update the colour being detected
-          printf("\nColour = %x ", val);
-          break;
-        }
-        case 'T': {
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b00 << 30) | ((0x3FFFFFFF >> 2) & val)); // update the colour being detected
-          printf("\nColour Threshold= %x ", val);
-          break;
-        }
-        case 'F': {
-          OV8865_FOCUS_Move_to(val); // update the colour being detected
-          printf("\nFocus= %x ", val);
-          break;
-        }
-        case 'A': {
-          IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b10 << 30) | ((0x3FFFFFFF >> 2) & val)); // update the colour being detected
-          printf("\nFrame Averaging= %x ", val);
-          break;
-        }
-        default: {
-          printf("\nInvalid Command");
-          break;
-        }
-        printf("\n");
+      } else { // handle beacon position request
+        printf("\nReceived beacon posiiton request\n");
+        awaiting_pos = TRUE;
+        // if (saturated) {
+        //   fprintf(esp_write, "H%08x\nB%08x\n", colour, (int) beacon_x); // if ready, send the hex being detected and the corresponding position
+        // }
       }
     }
-    
-    //Process input commands
-    // int in = getchar();
-    // switch (in) {
-    //     case 'e': {
-    //       exposureTime += EXPOSURE_STEP;
-    //       OV8865SetExposure(exposureTime);
-    //       printf("\nExposure = %x ", exposureTime);
-    //         break;}
-    //     case 'd': {
-    //       exposureTime -= EXPOSURE_STEP;
-    //       OV8865SetExposure(exposureTime);
-    //       printf("\nExposure = %x ", exposureTime);
-    //         break;}
-    //     case 't': {
-    //       gain += GAIN_STEP;
-    //       OV8865SetGain(gain);
-    //       printf("\nGain = %x ", gain);
-    //         break;}
-    //     case 'g': {
-    //       gain -= GAIN_STEP;
-    //       OV8865SetGain(gain);
-    //       printf("\nGain = %x ", gain);
-    //         break;}
-    //     case 'r': {
-    //       current_focus += manual_focus_step;
-    //       if(current_focus >1023) current_focus = 1023;
-    //       OV8865_FOCUS_Move_to(current_focus);
-    //       printf("\nFocus = %x ",current_focus);
-    //         break;}
-    //     case 'f': {
-    //       if(current_focus > manual_focus_step) current_focus -= manual_focus_step;
-    //       OV8865_FOCUS_Move_to(current_focus);
-    //       printf("\nFocus = %x ",current_focus);
-    //         break;}
-    //     case 'w': {
-    //       colour_threshold += colour_thresh_step;
-    //       if(colour_threshold > 0x0FFFFFFF) colour_threshold = 0x0FFFFFFF;
-    //       IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
-    //       printf("\nColour Thresh = %x ",colour_threshold);
-    //         break;}
-    //     case 's': {
-    //       colour_threshold -= colour_thresh_step;
-    //       if (colour_threshold < 0) colour_threshold = 0;
-    //       IOWR(0x42000, EEE_IMGPROC_BBCOL, (0x1 << 31) | colour_threshold); // update the threshold for colour detection
-    //       printf("\nColour Thresh = %x ",colour_threshold);
-    //         break;}
-    // }
-
 
     int msg_num = 0;
     int x_sum, y_sum, num, hw_x, hw_y, left, right, bottom, top;
-    double x, y, x_b, y_b;
+    float x, y, x_b, y_b;
     //Read messages from the image processor and print them on the terminal
     while ((IORD(0x42000,EEE_IMGPROC_STATUS)>>8) & 0xff) { 	//Find out if there are words to read
       int word = IORD(0x42000,EEE_IMGPROC_MSG); 			//Get next word from message buffer
       // if (fwrite(&word, 4, 1, ser) != 1) printf("Error writing to UART");
-      if (word == EEE_IMGPROC_MSG_START)	printf("\n");//Newline on message identifier
-      else {
-        printf("%d:%d,",msg_num, word);
+      if (word == EEE_IMGPROC_MSG_START)	
+      {
+        // printf("\n");//Newline on message identifier
+      } else {
+        #if DEBUG
+          printf("%d:%d,",msg_num, word);
+        #endif
         if (msg_num == 0) x_sum = word;
         else if (msg_num == 1) y_sum = word;
         else if (msg_num == 2) num = word;
@@ -373,20 +356,51 @@ int main()
           top = word & 0xFFFF;
         }
 
-
         msg_num++;
       }
     }
 
     if (msg_num != 0) { // new message arrived
-      x = x_sum / (double) num;
-      y = y_sum / (double) num;
+      if (num > min_pixel_thresh) { // there were pixels detected
+        #if DEBUG
+        x = x_sum / (float) num;
+        y = y_sum / (float) num;
 
-      x_b = (double) (left + right) / 2;
-      y_b = (double) (bottom + top) / 2;
+        y_b = (float) (bottom + top) / 2;
+        #endif
+        x_b = (float) (left + right) / 2; // only value that matters
+      } else {
+        x_b = -1;
+      }
 
-      printf("\n");
-      printf("x: %.2f, y: %.2f| bb x: %.2f, y: %.2f| hw x:%i, y:%i", x, y, x_b, y_b, hw_x, hw_y);
+      // if (beacon_pntr < num_avg) beacon_xs[beacon_pntr++] = x_b;
+      // else beacon_xs[beacon_pntr = 0] = x_b;
+
+      beacon_xs[beacon_pntr++%num_avg] = x_b;
+
+
+
+      if (!saturated) saturated = ++saturation == num_avg; // determine if the buffer is saturated 
+      else { // buffer is saturated and rolling avg can be computed
+        beacon_x = 0;
+        for (__uint8_t i = 0; i < num_avg; i++) beacon_x += beacon_xs[i];
+        beacon_x /= num_avg;
+        if (awaiting_pos) {
+          // write the hex values and position and whether or not there are any pixels being detected
+          // assuming that if no pixels where detected while the robot was observing, then it will be the case when it is being sampled
+          fprintf(esp_write, "D%cB%08x\nH%08x\n", ((num > min_pixel_thresh) ? '1' : '0'), (int) beacon_x, colour); 
+          // printf("D%cB%08x\nH%08x\n", ((num > min_pixel_thresh) ? '1' : '0'), (int) beacon_x, colour); 
+          awaiting_pos = FALSE;
+        }
+      }
+
+      #if DEBUG
+        printf("x: %.2f, y: %.2f| bb x: %.2f, y: %.2f| hw x:%i, y:%i|", x, y, x_b, y_b, hw_x, hw_y);
+      #endif
+
+      // printf("\nx_avg: %.2f\n", beacon_x);
+
+      // printf("%c %i\n", (saturated ? '1' : '0'), saturation);
     }
 
     usleep(1000);
