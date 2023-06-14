@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 // debug
-#define DEBUG TRUE
+#define DEBUG FALSE
 
 //EEE_IMGPROC defines
 #define EEE_IMGPROC_MSG_START ('R'<<16 | 'B'<<8 | 'B')
