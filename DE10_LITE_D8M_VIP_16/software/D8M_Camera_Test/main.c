@@ -215,6 +215,7 @@ int main()
   }
 
   int write_code;
+  // write_code = fprintf(esp_write, "Hello from nios!\n");
   if ( (write_code = fprintf(esp_write, "Hello from nios!\n")) <= 0 ) /*printf("Error writing to UART\n")*/; 
   // else printf("Wrote to UART with code: %d\n", write_code);
 
@@ -383,10 +384,10 @@ int main()
         x_b = -1;
       }
 
-      // if (beacon_pntr < num_avg) beacon_xs[beacon_pntr++] = x_b;
-      // else beacon_xs[beacon_pntr = 0] = x_b;
+      if (beacon_pntr < num_avg) beacon_xs[beacon_pntr++] = x_b;
+      else beacon_xs[beacon_pntr = 0] = x_b;
 
-      beacon_xs[beacon_pntr++%num_avg] = x_b;
+      // beacon_xs[beacon_pntr++%num_avg] = x_b;
 
 
 
@@ -413,7 +414,7 @@ int main()
       // printf("%c %i\n", (saturated ? '1' : '0'), saturation);
     }
 
-    usleep(10000);
+    usleep(1000);
 
   }
 
