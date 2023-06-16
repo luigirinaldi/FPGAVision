@@ -1004,7 +1004,7 @@
   <parameter name="enPRInitMode" value="false" />
   <parameter name="enableDiffWidth" value="false" />
   <parameter name="initMemContent" value="true" />
-  <parameter name="initializationFileName">/home/lr821/FPGAVision/DE10_LITE_D8M_VIP_16/software/D8M_Camera_Test/mem_init/Qsys_onchip_memory2_0.hex</parameter>
+  <parameter name="initializationFileName">/home/youlittleperson/Documents/Imperial/BalanceBug/EEE2Rover/DE10_LITE_D8M_VIP_16/software/D8M_Camera_Test/mem_init/Qsys_onchip_memory2_0.hex</parameter>
   <parameter name="instanceID" value="NONE" />
   <parameter name="memorySize" value="131072" />
   <parameter name="readDuringWriteMode" value="DONT_CARE" />
