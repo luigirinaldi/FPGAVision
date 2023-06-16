@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 // debug
-#define DEBUG FALSE
+#define DEBUG 1
 
 //EEE_IMGPROC defines
 #define EEE_IMGPROC_MSG_START ('R'<<16 | 'B'<<8 | 'B')
@@ -206,7 +206,7 @@ int main()
   IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b10 << 30) | 10); // update the number 
 
 
-  FILE* esp_write = fopen("/dev/uart_0", "wb+"); // use this only for writing
+  FILE* esp_write = fopen("/dev/uart_0", "rb+"); // use this only for writing
   if(esp_write){
     printf("Opened UART for writing\n");
   } else {
@@ -225,8 +225,18 @@ int main()
     printf("Failed to open UART for reading\n");
   } else printf("Opened UART read\n");
 
+  
+
   char incoming_char;
   int c;
+
+  printf("Flushing UART read buffer\n");
+  while((c = read(esp_read, &incoming_char, 1)) != -1){
+    #if DEBUG
+    printf("%c", incoming_char);
+    #endif
+  }
+  // printf("")
 
   // rolling average
   float beacon_xs[MAX_AVG];
@@ -373,10 +383,10 @@ int main()
         x_b = -1;
       }
 
-      // if (beacon_pntr < num_avg) beacon_xs[beacon_pntr++] = x_b;
-      // else beacon_xs[beacon_pntr = 0] = x_b;
+      if (beacon_pntr < num_avg) beacon_xs[beacon_pntr++] = x_b;
+      else beacon_xs[beacon_pntr = 0] = x_b;
 
-      beacon_xs[beacon_pntr++%num_avg] = x_b;
+      // beacon_xs[beacon_pntr++%num_avg] = x_b;
 
 
 
