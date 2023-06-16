@@ -1,7 +1,7 @@
 /*
  * mipi_bridge_config.c
  *
- *  Created on: 2015¦~4¤ë22¤é
+ *  Created on: 2015ï¿½~4ï¿½ï¿½22ï¿½ï¿½
  *      Author: Administrator
  */
 
@@ -98,11 +98,11 @@ void MipiBridgeInit(void){
 	alt_u16 data;
     int i, num;
 
-	printf("\nStart MipiBridgeInit!\n");
+	// printf("\nStart MipiBridgeInit!\n");
 
 	data = MipiBridgeRegRead(0x0000); // read chip and revision id;
 
-	printf("Chip and Revision ID is 0x%04xh(expected: 0x4401);\n",data);
+	// printf("Chip and Revision ID is 0x%04xh(expected: 0x4401);\n",data);
 
 
     num = sizeof(MipiBridgeReg)/sizeof(MipiBridgeReg[0]);
@@ -125,7 +125,7 @@ void MipiBridgeInit(void){
 //     MipiBridgeRegWrite(0x005E,((cap<<6) + (HsRxRs<<4) + ClkDly_data));
 //
 
-    printf("End MipiBridgeInit!\n\n");
+    // printf("End MipiBridgeInit!\n\n");
 
 }
 

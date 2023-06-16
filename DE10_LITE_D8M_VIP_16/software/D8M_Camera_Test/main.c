@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 // debug
-#define DEBUG 1
+#define DEBUG 0
 
 //EEE_IMGPROC defines
 #define EEE_IMGPROC_MSG_START ('R'<<16 | 'B'<<8 | 'B')
@@ -72,22 +72,22 @@ void mipi_show_error_info(void){
 	MDLSynErr = MipiBridgeRegRead(MIPI_REG_MDLSynErr);
 	FrmErrCnt = MipiBridgeRegRead(MIPI_REG_FrmErrCnt);
 	MDLErrCnt = MipiBridgeRegRead(MIPI_REG_MDLErrCnt);
-	printf("PHY_status=%xh, CSI_status=%xh, MDLSynErr=%xh, FrmErrCnt=%xh, MDLErrCnt=%xh\r\n", PHY_status, SCI_status, MDLSynErr,FrmErrCnt, MDLErrCnt);
+	// printf("PHY_status=%xh, CSI_status=%xh, MDLSynErr=%xh, FrmErrCnt=%xh, MDLErrCnt=%xh\r\n", PHY_status, SCI_status, MDLSynErr,FrmErrCnt, MDLErrCnt);
 }
 
 void mipi_show_error_info_more(void){
-    printf("FrmErrCnt = %d\n",MipiBridgeRegRead(0x0080));
-    printf("CRCErrCnt = %d\n",MipiBridgeRegRead(0x0082));
-    printf("CorErrCnt = %d\n",MipiBridgeRegRead(0x0084));
-    printf("HdrErrCnt = %d\n",MipiBridgeRegRead(0x0086));
-    printf("EIDErrCnt = %d\n",MipiBridgeRegRead(0x0088));
-    printf("CtlErrCnt = %d\n",MipiBridgeRegRead(0x008A));
-    printf("SoTErrCnt = %d\n",MipiBridgeRegRead(0x008C));
-    printf("SynErrCnt = %d\n",MipiBridgeRegRead(0x008E));
-    printf("MDLErrCnt = %d\n",MipiBridgeRegRead(0x0090));
-    printf("FIFOSTATUS = %d\n",MipiBridgeRegRead(0x00F8));
-    printf("DataType = 0x%04x\n",MipiBridgeRegRead(0x006A));
-    printf("CSIPktLen = %d\n",MipiBridgeRegRead(0x006E));
+    //print("FrmErrCnt = %d\n",MipiBridgeRegRead(0x0080));
+    //print("CRCErrCnt = %d\n",MipiBridgeRegRead(0x0082));
+    //print("CorErrCnt = %d\n",MipiBridgeRegRead(0x0084));
+    //print("HdrErrCnt = %d\n",MipiBridgeRegRead(0x0086));
+    //printf("EIDErrCnt = %d\n",MipiBridgeRegRead(0x0088));
+    //printf("CtlErrCnt = %d\n",MipiBridgeRegRead(0x008A));
+    //printf("SoTErrCnt = %d\n",MipiBridgeRegRead(0x008C));
+    //printf("SynErrCnt = %d\n",MipiBridgeRegRead(0x008E));
+    //printf("MDLErrCnt = %d\n",MipiBridgeRegRead(0x0090));
+    //printf("FIFOSTATUS = %d\n",MipiBridgeRegRead(0x00F8));
+    //printf("DataType = 0x%04x\n",MipiBridgeRegRead(0x006A));
+    //printf("CSIPktLen = %d\n",MipiBridgeRegRead(0x006E));
 }
 
 
@@ -98,7 +98,7 @@ bool MIPI_Init(void){
 
 	bSuccess = oc_i2c_init_ex(I2C_OPENCORES_MIPI_BASE, 50*1000*1000,400*1000); //I2C: 400K
 	if (!bSuccess)
-		printf("failed to init MIPI- Bridge i2c\r\n");
+		//printf("failed to init MIPI- Bridge i2c\r\n");
 
     usleep(50*1000);
     MipiBridgeInit();
@@ -107,7 +107,7 @@ bool MIPI_Init(void){
 
 //	bSuccess = oc_i2c_init_ex(I2C_OPENCORES_CAMERA_BASE, 50*1000*1000,400*1000); //I2C: 400K
 //	if (!bSuccess)
-//		printf("failed to init MIPI- Camera i2c\r\n");
+//		//printf("failed to init MIPI- Camera i2c\r\n");
 
     MipiCameraInit();
     MIPI_BIN_LEVEL(DEFAULT_LEVEL);
@@ -147,8 +147,8 @@ int main()
 
 	fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
 
-  printf("DE10-LITE D8M\n");
-  printf("Imperial College EEE2 Magenta Project\n");
+  //printf("DE10-LITE D8M\n");
+  //printf("Imperial College EEE2 Magenta Project\n");
 
   IOWR(MIPI_PWDN_N_BASE, 0x00, 0x00);
   IOWR(MIPI_RESET_N_BASE, 0x00, 0x00);
@@ -158,8 +158,8 @@ int main()
   usleep(2000);
   IOWR(MIPI_RESET_N_BASE, 0x00, 0xFF);
 
-  printf("Image Processor ID: %x\n",IORD(0x42000,EEE_IMGPROC_ID));
-//   //printf("Image Processor ID: %x\n",IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_ID)); //Don't know why this doesn't work - definition is in system.h in BSP
+  //printf("Image Processor ID: %x\n",IORD(0x42000,EEE_IMGPROC_ID));
+//   ////printf("Image Processor ID: %x\n",IORD(EEE_IMGPROC_0_BASE,EEE_IMGPROC_ID)); //Don't know why this doesn't work - definition is in system.h in BSP
 
 
   usleep(2000);
@@ -167,9 +167,9 @@ int main()
 
   // MIPI Init
    if (!MIPI_Init()){
-	  printf("MIPI_Init Init failed!\r\n");
+	  //printf("MIPI_Init Init failed!\r\n");
   }else{
-	  printf("MIPI_Init Init successfully!\r\n");
+	  //printf("MIPI_Init Init successfully!\r\n");
   }
 
 //   while(1){
@@ -177,9 +177,9 @@ int main()
 	 	usleep(50*1000);
  	    mipi_clear_error();
 	 	usleep(1000*1000);
-	    mipi_show_error_info();
+	    // mipi_show_error_info();
 //	    mipi_show_error_info_more();
-	    printf("\n");
+	    // //printf("\n");
 //   }
 
   //////////////////////////////////////////////////////////
@@ -208,32 +208,32 @@ int main()
 
   FILE* esp_write = fopen("/dev/uart_0", "rb+"); // use this only for writing
   if(esp_write){
-    printf("Opened UART for writing\n");
+    // //printf("Opened UART for writing\n");
   } else {
-    printf("Failed to open UART for writing\n");
+    // //printf("Failed to open UART for writing\n");
     while (1);
   }
 
   int write_code;
-  if ( (write_code = fprintf(esp_write, "Hello from nios!\n")) <= 0 ) printf("Error writing to UART\n"); 
-  else printf("Wrote to UART with code: %d\n", write_code);
+  if ( (write_code = fprintf(esp_write, "Hello from nios!\n")) <= 0 ) /*printf("Error writing to UART\n")*/; 
+  // else printf("Wrote to UART with code: %d\n", write_code);
 
   int esp_read;
   esp_read = open("/dev/uart_0", O_RDONLY | O_NONBLOCK);
 
-  if (esp_read == -1){
-    printf("Failed to open UART for reading\n");
-  } else printf("Opened UART read\n");
+  // if (esp_read == -1){
+  //   printf("Failed to open UART for reading\n");
+  // } else printf("Opened UART read\n");
 
   
 
   char incoming_char;
   int c;
 
-  printf("Flushing UART read buffer\n");
+  // printf("Flushing UART read buffer\n");
   while((c = read(esp_read, &incoming_char, 1)) != -1){
     #if DEBUG
-    printf("%c", incoming_char);
+    //print("%c", incoming_char);
     #endif
   }
   // printf("")
@@ -247,7 +247,7 @@ int main()
   int saturation = 0;
   bool awaiting_pos = FALSE;
 
-  printf("Entering main loop\n");
+  //print("Entering main loop\n");
 
   while(1){
 
@@ -277,33 +277,33 @@ int main()
         #if DEBUG
           printf("\nFinished reading\n");
         #endif
-        printf("ESP %c: %08x\n", incoming_char, val);
+        //print("ESP %c: %08x\n", incoming_char, val);
 
         switch(incoming_char){
           case 'E': {
             OV8865SetExposure(val);
-            printf("\nExposure = %x", val);
+            //print("\nExposure = %x", val);
             break;
           }
           case 'G': {
             OV8865SetGain(val);
-            printf("\nGain = %x ", val);
+            //print("\nGain = %x ", val);
             break;
           }
           case 'H': {
             IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b01 << 30) | ((0x3FFFFFFF >> 2) & val)); // update the colour being detected
             colour = val;
-            printf("\nColour = %x ", val);
+            //print("\nColour = %x ", val);
             break;
           }
           case 'T': {
             IOWR(0x42000, EEE_IMGPROC_BBCOL, (0b00 << 30) | ((0x3FFFFFFF >> 2) & val)); // update the colour being detected
-            printf("\nColour Threshold= %x ", val);
+            //print("\nColour Threshold= %x ", val);
             break;
           }
           case 'F': {
             OV8865_FOCUS_Move_to(val); // update the colour being detected
-            printf("\nFocus= %x ", val);
+            //print("\nFocus= %x ", val);
             break;
           }
           case 'A': {
@@ -313,22 +313,22 @@ int main()
             memset(beacon_xs, 0, sizeof beacon_xs);
             saturation = 0;
             saturated = FALSE;
-            printf("\nFrame Averaging= %x ", val);
+            //print("\nFrame Averaging= %x ", val);
             break;
           }
           case 'P': {
             min_pixel_thresh = val;
-            printf("\nMin pixel Threshold= %x ", min_pixel_thresh);
+            //print("\nMin pixel Threshold= %x ", min_pixel_thresh);
             break;
           }
           default: {
-            printf("\nInvalid Command");
+            //print("\nInvalid Command");
             break;
           }
           // printf("\n");  
         }
       } else { // handle beacon position request
-        printf("\nReceived beacon posiiton request\n");
+        //print("\nReceived beacon posiiton request\n");
         awaiting_pos = TRUE;
         // if (saturated) {
         //   fprintf(esp_write, "H%08x\nB%08x\n", colour, (int) beacon_x); // if ready, send the hex being detected and the corresponding position
@@ -383,10 +383,10 @@ int main()
         x_b = -1;
       }
 
-      if (beacon_pntr < num_avg) beacon_xs[beacon_pntr++] = x_b;
-      else beacon_xs[beacon_pntr = 0] = x_b;
+      // if (beacon_pntr < num_avg) beacon_xs[beacon_pntr++] = x_b;
+      // else beacon_xs[beacon_pntr = 0] = x_b;
 
-      // beacon_xs[beacon_pntr++%num_avg] = x_b;
+      beacon_xs[beacon_pntr++%num_avg] = x_b;
 
 
 

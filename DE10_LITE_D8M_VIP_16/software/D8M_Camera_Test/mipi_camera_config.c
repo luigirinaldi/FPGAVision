@@ -625,13 +625,14 @@ void MipiCameraInit(void)
 //
 
 
-	 OV8865DB("\nStart MipiCameraInit -OV8865!\r\n");
-	 OV8865DB("Write Read Test!\n");
+	//  OV8865DB("\nStart MipiCameraInit -OV8865!\r\n");
+	//  OV8865DB("Write Read Test!\n");
 
 	    for(i=0;i<10;i++){
 	       OV8865_write_cmos_sensor_8(0x3809,i);
 	      usleep(100);
-	        printf("%d (%d)\n",OV8865_read_cmos_sensor_8(0x3809),i);
+				int result = OV8865_read_cmos_sensor_8(0x3809);
+	        // printf("%d (%d)\n",OV8865_read_cmos_sensor_8(0x3809),i);
 	      usleep(100);
 	    }
 	 num = sizeof(MipiCameraReg)/sizeof(MipiCameraReg[0]);
@@ -647,7 +648,7 @@ void MipiCameraInit(void)
 
 
 
-	 OV8865DB("\nEnd MipiCameraInit! -OV8865!\r\n\n");
+	//  OV8865DB("\nEnd MipiCameraInit! -OV8865!\r\n\n");
 
 }
 
