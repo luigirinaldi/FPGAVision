@@ -403,8 +403,9 @@ int main()
       // printf("%c %i\n", (saturated ? '1' : '0'), saturation);
     }
 
-    usleep(1000);
+    usleep(10000);
 
-   };
+  }
+
   return 0;
 }
